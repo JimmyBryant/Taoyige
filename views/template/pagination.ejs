@@ -1,0 +1,54 @@
+<div class="pager-box">
+<%if(typeof pager != 'undefined'){%>
+  <ul class="pagination">
+	<%var showPageCount=10,
+		cp=pager.pageNum,
+		pl=pager.pageLength,
+		c=pager.pageCount;
+	%>
+		<%if(cp>1){%>
+			<li ><a href="<%=pager.url+'page='+(cp-1)+'&len='+pl%>">«</a></li>
+		<%}else{%>
+			<li class="disabled"><a href="javascript:;">«</a></li>
+		<%}if(c>showPageCount){%>
+			<%if(cp<(showPageCount-2)){%>			
+				<%for(var i=1;i<showPageCount;i++){%>
+				    <li  class="<%=cp==i?'active':''%>"><a href="<%=pager.url+'page='+i+'&len='+pl%>"><%=i%></a></li>
+				<%}%>
+				 <li  class="disabled"><a>...</a></li>
+			<%}else{ var gap=c-cp>3?3:c-cp;%>
+				<%for(var i=1;i<=6-gap;i++){%>
+					<li>
+						<a href="<%=pager.url+'page='+i+'&len='+pl%>">
+							<%=i%>
+						</a>
+					</li>					
+				<%}%>
+				<li  class="disabled"><a>...</a></li>
+				<li><a href="<%=pager.url+'page='+(cp-2)+'&len='+pl%>"><%=cp-2%></a></li>
+				<li><a href="<%=pager.url+'page='+(cp-1)+'&len='+pl%>"><%=cp-1%></a></li>
+				<li class="active"><a><%=cp%></a></li>
+				<%if(gap!=3)gap++;for(var n=1;n<gap;n++){%>
+				<li><a href="<%=pager.url+'page='+(cp+n)+'&len='+pl%>"><%=cp+n%></a></li>
+				<%}%>
+				<%if(gap==3){%>
+					<li  class="disabled"><a>...</a></li>
+				<%}%>
+			<%}%>
+		<%}else{%>		
+			<%for(var i=1;i<=c;i++){%>
+				    <li  class="<%=cp==i?'active':''%>"><a href="<%=pager.url+'page='+i+'&len='+pl%>"><%=i%></a></li>
+			<%}%>
+		<%}if(cp<c){%>
+			<li ><a href="<%=pager.url+'page='+(parseInt(cp)+1)%>">»</a></li>
+		<%}else{%>
+			<li class="disabled"><a href="javascript:;">»</a></li>
+		<%}%>
+  </ul>
+  <label class="page-number">
+  共
+  <span class="badge"><em><%=c||0%></em></span>
+  页
+  </label>
+<%}%>
+</div>

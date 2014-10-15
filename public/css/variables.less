@@ -1,0 +1,82 @@
+@max_width:640px;
+@min_width:320px;
+@header_height:45px;
+@font_small:0.75em;
+@font_normal:0.875em;
+@font_medium:1em;
+@font_large:1.125em;
+@font_xlarge:1.25em;
+
+@base_col1:#F95E26;
+@base_col2:#24b5ba;
+@link_col:#333;
+@price_col:#FF3201;
+@body_bc:#FFF;
+@user_body_bc:#e8e8e8;
+@border_col:#e0e0e0;
+@btn_border_col:#c5c5c5;
+@form_border_col:#dadada;
+@bg_red:#ed145b;
+@bg_grey:#C7C7C7;
+
+@mini:2px;
+@small:4px;
+@normal:8px;
+@medium:12px;
+@large:24px;
+@x-large:48px;
+
+@icon_small:16px;
+@icon_normal:24px;
+@icon_medium:32px;
+@icon_large:64px;
+
+.border-radius(@a:4px,@b:4px,@c:4px,@d:4px){
+ border-radius:@a @b @c @d;
+ -webkit-border-radius:@a @b @c @d;
+ -moz-border-radius:@a @b @c @d;
+ -ms-border-radius:@a @b @c @d;
+ -o-border-radius:@a @b @c @d;
+}
+.transition(@t:all,@d:.1s,@e:ease-in){
+ transition:@t @d @e;
+ -webkit-transition:@t @d @e;
+ -moz-transition:@t @d @e;
+ -ms-transition:@t @d @e;
+ -o-transition:@t @d @e;
+}
+.inset-box-shadow(@x,@y,@b,@c,@i:inset){
+ box-shadow:@i @x @y @b @c;
+ -webkit-box-shadow:@i @x @y @b @c;
+ -moz-box-shadow:@i @x @y @b @c;
+ -ms-box-shadow:@i @x @y @b @c;
+ -o-box-shadow:@i @x @y @b @c;
+}
+.box-shadow(@x,@y,@b,@c){
+ box-shadow:@x @y @b @c;
+ -webkit-box-shadow:@x @y @b @c;
+ -moz-box-shadow:@x @y @b @c;
+ -ms-box-shadow:@x @y @b @c;
+ -o-box-shadow:@x @y @b @c;
+}
+.text-shadow(@x,@y,@b,@c){
+ text-shadow:@x @y @b @c;
+ -webkit-text-shadow:@x @y @b @c;
+ -moz-text-shadow:@x @y @b @c;
+ -ms-text-shadow:@x @y @b @c;
+ -o-text-shadow:@x @y @b @c;
+}
+.gradient(@t:linear,@f,@t,@s,@e){
+	background-image: -webkit-gradient(
+		linear,
+		left @f,
+		left @e,
+		color-stop(0, @s),
+		color-stop(1, @e)
+	);
+	background-image: -o-linear-gradient(@e, @s 0%, @e 100%);
+	background-image: -moz-linear-gradient(@e, @s 0%, @e 100%);
+	background-image: -webkit-linear-gradient(@e, @s 0%, @e 100%);
+	background-image: -ms-linear-gradient(@e, @s 0%, @e 100%);
+	background-image: linear-gradient(to @e, @s 0%, @e 100%);
+}

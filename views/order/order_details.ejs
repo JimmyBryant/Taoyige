@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<%include ../template/hmeta %>
+	</head>	
+	<body class="body-order">
+		<header>
+			<div class="user-header">
+				<a href="javascript:;" class="h-left h-back"><span>返回</span></a>
+				<h2>订单详情</h2>
+				<a href="/" class="h-right h-home"><span>主页</span></a>
+			</div>
+		</header>
+		<%var parseTime=function(t){
+			return t<10?'0'+t:t;
+		}%>
+		<%if(order){var D = new Date(order.timestamp),y=D.getFullYear(),m=D.getMonth()+1,d=D.getDate(),h=D.getHours(),mi=D.getMinutes(),s=D.getSeconds();var expires = parseInt(order.timer)+parseInt(order.timestamp)-Date.now();%>
+		<!-- order form -->
+		<form id="form-order" action="/order/create" method="POST">
+
+			<div class="box"> 
+				<!-- 订单信息 -->
+				<dl class="panel panel-default">
+					<dt class="panel-heading">
+						订单号：<span><%=order.id%></span>
+					</dt>
+					<dd class="panel-body">
+						<p>订单状态：<span class="text-primary"><%=orderStatus[order.status]%></span>			
+							<%if(order.status==orderStatus.delivered){%>
+							<span class="margin-lr-medium">
+							<a href="/order/track?id=<%=order.id%>" class="btn btn-info btn-paynow">
+								跟踪订单
+							</a>
+							</span>
+							<%}%>
+						</p>
+						<p>支付方式：<span>在线支付</span></p>
+						<p>下单时间：<span><%=y+'-'+parseTime(m)+'-'+parseTime(d)%> <%=parseTime(h)+':'+parseTime(mi)+':'+parseTime(s)%></span></p>
+					</dd>
+				</dl>
+				<!-- 商品详情 -->
+				<dl class="panel panel-default">
+					<%var product = order.product;%>
+					<dt class="panel-heading">
+						商品详情
+					</dt>
+					<dd class="panel-body">
+						<ul class="order-product-list">
+							<li>
+								<a href="#">
+									<img src="<%=product.thumbImageUrl[0]%>"/>
+									<div class="product-info">
+										<p class="p-title"><%=product.title%></p>
+										<p class="p-price">￥<span><%=order.amount%></span></p>
+										<p>数量：<span><%=order.count%></span></p>
+									</div>
+								</a>	
+							</li>
+						</ul>
+
+					</dd>
+				</dl>
+				<!-- 收货人信息 -->
+				<dl class="panel panel-default">
+					<dt class="panel-heading">
+						收货信息
+					</dt>
+					<%var addrInfo = order.addressInfo;%>
+					<dd class="panel-body">
+						<p>姓名：<span><%=addrInfo.name%></span></p>
+						<p>手机：<span><%=addrInfo.mobilephone%></span></p>
+						<p>地址：<span><%=addrInfo.details%></span></p>
+					</dd>
+				</dl>
+				<!-- 详情 -->
+				<dl class="panel panel-default">
+					<dt class="panel-heading">详情</dt>
+					<dd class="panel-body">
+						<div class="order-details-info">
+						<p>订单总件数：<span><%=order.count%></span></p>
+						<p>商品总金额：<span>￥<%=order.totalPrice%></span></p>
+						<p>运费：<span>￥<%=order.freight||0%></span></p>
+						<p>支付方式：<span><em class="icon icon-alipay"></em></span></p>
+						<p>应付金额：<span class="order-price">￥<%=order.amount%></span></p>
+						</div>
+					</dd>
+				</dl>
+				<%if(order.status==orderStatus.unpaid){%>
+				<!-- 取消订单 -->
+				<div class="order-cancel">
+					<a class="btn btn-primary btn-cancel-order" href="/order/close?id=<%=order.id%>&pid=<%=order.productID%>">取消订单
+					</a>
+				</div>
+				<!-- 付款 -->
+				<div class="nav-fixed-bottom bg-white">
+					<a href="/purchase/pay?id=<%=order.id%>" class="T-btn T-btn-red btn-paynow">
+						立即支付
+						<label class="time-tick" data-expires="<%=expires%>" data-orderid="<%=order.id%>">
+							<span class="glyphicon glyphicon-time"></span>
+							<%if(expires>1000){%>
+								<%var minute = Math.floor(expires/60000),second=Math.floor((expires%60000)/1000);%>
+								<em><%=parseTime(minute)%>:<%=parseTime(second)%></em>
+							<%}else{%>
+								<em>00:00</em>
+							<%}%>
+						</label>
+					</a>
+
+				</div>
+				<%}%>
+			</div>
+
+		</form>
+		<%}%>
+
+		<!-- footer -->
+		<% include ../template/user_footer %>
+
+		<!-- script -->
+		<script type="text/javascript">
+			require(['jquery','umain'],function($,main){
+				main.timeTick();
+			})
+		</script>
+	</body>
+</html>

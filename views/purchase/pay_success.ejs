@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<%include ../template/hmeta %>
+	</head>	
+	<body class="body-white">
+		<header>
+			<div class="user-header">
+				<a href="javascript:;" class="h-left h-back"><span>返回</span></a>
+				<h2>交易成功</h2>
+				<a href="/" class="h-right h-home"><span>主页</span></a>
+			</div>
+		</header>
+
+
+		<div class="box">
+			<dl class="info-box"> 
+				<dt class="title alert alert-success">
+					<span class="glyphicon glyphicon-ok"></span><strong>订单支付成功</strong>						
+				</dt>
+				<dd class="cont">
+					<p>
+						<span id="second-tick">5</span>秒后跳转到首页
+						<%if(trade.id){%>
+						<b class="verticl-split-line"></b>
+						你也可以<a href="/order/details?id=<%=trade.out_trade_no%>">查看订单</a>
+						<%}%>
+					</p>					
+				</dd>
+			</dl>
+
+		</div>			
+
+		<!-- footer -->
+		<%include ../template/user_footer %>
+		<!-- script -->
+		<script type="text/javascript">
+		require(['jquery','main'],function ($,main) {
+			main.secondTick($('#second-tick'),function(){
+				location.href="/";
+			})	
+		})
+		</script>
+	</body>
+</html>

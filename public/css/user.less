@@ -1,0 +1,201 @@
+@import "variables";
+body{
+	background-color:@user_body_bc;
+}
+.user-header .h-back span,.user-header .h-home span{
+	background-image:url(../images/common/user_icons.png);
+	background-repeat:no-repeat;
+	background-size:50px;
+}
+.quick-nav .shortcut,
+.user-action .icon{
+	background:url(../images/common/user_icons.png) no-repeat;	
+	background-size: 60px;
+}
+.user-header{
+	background:#FFF;	
+	.box-shadow(0,2px,4px,rgba(0,0,0,.4));
+	h2{
+		line-height:@header_height;
+		font-weight:normal;
+	}
+	.h-back span,
+	.h-home span{
+		display:block;
+		width:18px;
+		height:18px;
+		margin-top:15px;
+		line-height: 20em;
+		overflow:hidden;
+	}
+	.h-back span{
+		background-position:-4px -1px;
+	}
+	.h-home span{
+		background-position:-4px -105px;
+	}
+}
+
+.user-info{
+	margin:@medium @large;
+	font-size:@font_medium;
+	.icon-alipay{
+		width: @icon_normal;
+		height: @icon_normal;
+		margin-left: 0 @normal;
+		background: url(../images/logo/alipay_logo.png) no-repeat;
+		background-size: @icon_normal;
+	}
+}
+
+.quick-nav{
+	background:#FFF;
+	margin:0 @medium @medium;
+	padding:@medium @normal;
+	.border-radius(@small,@small,@small,@small);
+	.box-shadow(0,2px,3px,rgba(0,0,0,.1));
+	ul.nav li{
+		float:left;
+		width:33%;
+		text-align:center;
+		a{
+			display:block;
+			border-left: 1px dashed @border_col;
+			font-size:@font_small;
+			padding:0;
+			.shortcut{	
+				position:relative;			
+				display:inline-block;
+				width:38px;
+				height:30px;
+				.badge{
+					display:block;
+					position:absolute;
+					width:15px;
+					height:15px;
+					top:-8px;
+					right:-8px;
+					overflow:hidden;
+					background-color:@bg_red;
+					color:white;
+					line-height: 15px;
+					padding: 0;
+					.border-radius(100%,100%,100%,100%);
+					z-index:99;
+				}				
+			}
+			.shortcut-needpay{
+				background-position:-25px -8px;
+			}
+			.shortcut-needcheck{
+				background-position:-12px -162px;
+			}
+			.shortcut-moreorder{
+				background-position:-25px -59px;
+			}
+		}		
+	}
+	ul.nav li:first-child a{
+		border-left:none;
+	}
+
+}
+
+.user-action{
+	background:#FFF;
+	margin:0 @medium @medium;
+	.border-radius(@small,@small,@small,@small);
+	.box-shadow(0,2px,3px,rgba(0,0,0,.1));
+	.action-list li{
+		height:42px;
+		line-height:42px;
+		border-bottom:1px solid @border_col;
+		.icon{
+			display:inline-block;
+			width: 20px;
+			height: 18px;
+			margin: @medium @normal 0 @normal;
+			vertical-align:top;
+		}
+		.icon-add{
+			background-position:-35px -103px;
+		}
+		.icon-service{
+			background-position:-35px -127px;
+		}
+		a{
+			display:block;
+			height:100%;
+			b{
+				display:block;
+				float:right;
+				width:12px;
+				height:12px;
+				background: url(../images/common/user_icons.png) no-repeat;
+				background-position: -8px -87px;
+				background-size: 50px;
+				margin:14px 8px 0 0;
+			}
+			.telno{
+				color:#EE0202;
+				margin-left:@medium;				
+			}
+		}
+	}
+}
+
+.address-list{
+	.address-box{
+		background:#FFF url(../images/common/addr_top_bg.jpg) repeat-x;
+		background-size: 36px;
+		margin-bottom:@medium;
+		padding:@normal @medium;
+		font-size:@font_small;
+		line-height:24px;
+		.border-radius(@small,@small,@small,@small);
+		.addr-tel{
+			padding-left:@large;
+			color:grey;
+		}
+		.addr-oper{
+			margin-top:@normal;
+			padding:@normal @medium 0;
+			text-align:right;
+			border-top:1px dashed @border_col;
+			.oper-item{
+				margin-left:@medium;
+				span{
+					background:url(../images/common/flowicon.png) no-repeat;
+					background-size:200px;
+					display:inline-block;
+					width:17px;
+					height:15px;
+					vertical-align:text-top;
+					margin-right:@small;
+				}
+			}
+			.oper-edit span{
+				background-position: -32px 0;
+			}
+			.oper-delete span{
+				background-position: -32px -27px;
+			}
+		}
+	}
+	.address-selected{
+		position:relative;
+		border:1px solid @price_col;
+		.glyphicon{
+			position: absolute;
+			left: 0;
+			bottom: 0px;
+			top: auto;
+			width: 18px;
+			height: 18px;
+			line-height: 18px;
+			text-align: center;
+			background: @base_col1;
+			color: #fff;
+		}
+	}
+}

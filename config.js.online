@@ -1,0 +1,22 @@
+module.exports = {
+	"host":"http://www.taoyige.com",
+	"shost":"http://s.taoyige.com",
+	"port":"3001",
+	"redis":{
+		"host":"127.0.0.1",
+		"port":"6381"
+	},
+	"session":{
+		"secret":"sdfl哪里",
+		"maxAge":2*3600*1000
+	},
+	"cookie":{
+		"secret":"23g奋斗史",
+		"maxAge":24*3600*1000,
+		"authCookie":"T_Auth_Info"
+	},
+	"administrators":[{
+		"name":"instreet",
+		"password":"instreet123"
+	}]
+}

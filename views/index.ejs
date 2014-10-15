@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>  
+    <% include template/meta %>
+    <title>淘一个</title>
+  </head>
+
+  <body>    
+  	<div class="main">
+  		<header class="index-header">
+  			<div class="h-left">
+  				<a href="/user/home" class="user-home">
+            用户中心<%if(user){%><b></b><%}%>
+          </a>
+  				<div class="h-slogan">
+  					<span>闪淘五湖四海</span>
+  					<span>精选万里挑一</span>
+  					<span>直邮千家万户</span>
+  					<span>承诺假一赔十</span>
+  				</div>
+  			</div>
+  			<div class="h-right">
+  				<a href="/" class="logo">淘一个</a>
+  			</div>
+  		</header>
+  		<!-- 今日抢购 -->
+  		<div id="sale-today">
+        <%if(product){%>
+        <input type="hidden" id="today-product-id" value="<%=product.id%>"/>
+        <a href="/product/details?id=<%=product.id%>" class="p-image-box">
+        	<img alt="<%=product.title%>" src="<%=product.largeImageUrl[0]%>"/>
+        </a>
+        <p class="p-title">
+          <%=product.title%>
+        </p>
+  			<ul class="sale-desc clearfix">
+  				<li class="p-sales"><span class="p-icon"></span><label>已售：<span><%=product.salesVolume%>件</span></label></li>
+				<li class="p-store"><span class="p-icon"></span><label>库存：<span><%=product.count%>件</span></label></li>
+  			</ul>
+  			<div class="p-action clearfix">
+  				<div class="left">
+  					<label class="p-nowprice"><strong>￥<%=product.price%></strong></label>
+  				</div>
+  				<div class="right">
+  					<label >
+  						<span class="p-price">市场价：<em><%=product.oriPrice%></em></span>
+  						<span class="p-discount">开业营销补贴：<em><%=parseFloat(product.oriPrice)-parseFloat(product.price)%></em></span>
+  					</label>
+  					<a href="javascript:;" class="btn-shopping-now <%if(product.count<1||product.saleStartTime>Date.now()){%>disable<%}%>">立即闪购</a>
+  				</div>
+  			</div>
+        <%}%>
+  		</div>
+  		<!-- 即将开始 -->
+  		<table id="table-sale-soon">
+      <%readylist.forEach(function(val){ 
+        var p = JSON.parse(val);
+        if(new Date(p.saleStartTime).getDate()-new Date().getDate()==1){%>
+  			<tr>
+  				<td>
+  					<a href="javascript:;" class="title">
+  						明日开淘<b class="arrow-right"><b>
+  					</a>
+  				</td>
+  				<td>
+	  				<a href="/product/details?id=<%=p.id%>" class="cont">
+	  					<img src="<%=p.bannerUrl%>"/>
+	  				</a>	
+  				</td>
+  			</tr>
+        <%}})%>
+  		</table>
+  		<!-- footer -->
+      <% include template/user_footer %>
+      <!-- script -->
+      <script type="text/javascript">
+        require(['jquery','main'],function ($,main) {
+
+        })
+      </script>
+  	</div>
+    <script src="http://meiqia.com/js/unit/button.js?id=3641" charset="UTF-8">
+    </script>
+  </body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<%include ../template/hmeta %>
+	</head>	
+	<body>
+		<!-- header -->
+		<header>
+			<div class="user-header">
+				<a href="javascript:;" class="h-left h-back"><span>返回</span></a>
+				<h2>添加收货地址</h2>
+				<a href="/" class="h-right h-home"><span>首页</span></a>
+			</div>
+		</header>
+		<!-- 添加配送地址 -->
+		<form id="form-address" action="/user/addAddress" method="post">
+		<input type="hidden" name="action" value="<%=action%>"/>
+		<div class="conner-box">			
+				<div class="input-field">
+					<label class="field-title">姓名：</label>
+					<span class="field-content">
+						<input data-validate="addr-name" type="text" name="name" id="name" maxlength="30"/>
+					</span>
+				</div>
+				<div class="input-field">
+					<label class="field-title">手机：</label>
+					<span class="field-content">
+						<input type="text" data-validate="addr-mobile" name="mobilephone" id="mobilephone" maxlength="11"/>
+					</span>
+				</div>
+				<div class="input-field">
+					<label class="field-title">省份：</label>
+					<span class="field-content">
+						<select name="province" id="province" data-validate="addr-province">
+							<option value="0">请选择</option>
+						</select>
+						<b class="arrow-down"></b>
+					</span>
+				</div>
+				<div class="input-field">
+					<label class="field-title">城市：</label>
+					<span class="field-content">
+						<select name="city" id="city" data-validate="addr-city">
+							<option value="0">请选择</option>
+						</select>
+						<b class="arrow-down"></b>
+					</span>
+				</div>
+				<div class="input-field">
+					<label class="field-title">区县：</label>
+					<span class="field-content">
+						<select name="county" id="county" data-validate="addr-county">
+							<option value="0">请选择</option>
+						</select>
+						<b class="arrow-down"></b>
+					</span>
+				</div>
+<!-- 				<div class="input-field">
+					<label class="field-title">街道：</label>
+					<span class="field-content">
+						<select name="street" id="street">
+							<option value="0">请选择</option>
+							<option value="-1">无</option>
+						</select>
+						<b class="arrow-down"></b>
+					</span>
+				</div> -->
+				<div class="input-field">
+					<label class="field-title">邮编：</label>
+					<span class="field-content">
+						<input type="text" name="postcode" id="postcode" data-validate="addr-postcode"/>
+					</span>
+				</div>
+		</div>
+		<div class="conner-box">
+			<div class="input-field">
+				<label class="field-title-block">详细地址：</label>
+				<span class="field-content-full">
+					<textarea name="details" rows="5" data-validate="addr-details"></textarea>
+				</span>
+			</div>
+		</div>
+
+		<div class="box">
+			<button type="submit" class="T-btn T-btn-red">保存地址</button>
+		</div>
+		</form>
+
+
+		<!-- Footer -->
+		<% include ../template/user_footer %>
+		<!-- script -->
+		<script type="text/javascript">
+
+			require(['umain'],function (main){
+				main.addressForm();			
+			});	
+
+		</script>
+	</body>
+</html>

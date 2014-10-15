@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<%include ../template/hmeta %>
+	</head>	
+	<body>
+		<header>
+			<div class="user-header">
+				<a href="javascript:;" class="h-left h-back"><span>返回</span></a>
+				<h2>个人中心</h2>
+				<a href="/" class="h-right h-home"><span>主页</span></a>
+			</div>
+		</header>
+		<!-- 用户信息 -->
+		<div class="user-info">
+			<p>
+				账户：<span  class="user-name"><%=user.userName%></span><em class="icon icon-alipay">支付宝</em>
+			</p>
+		</div>
+		<!-- 快速导航 -->
+		<div class="quick-nav">
+			<ul class="nav clearfix">
+				<li>
+					<a href="/order/unpaid">
+						<span class="shortcut shortcut-needpay"></span>
+						<p>待付款</p>
+					</a>
+				</li>
+				<li>
+					<a href="/order/paid">
+						<span class="shortcut shortcut-needcheck"></span>
+						<p>待收货</p>
+					</a>
+				</li>
+				<li>
+					<a href="/order/complete">
+						<span class="shortcut shortcut-moreorder"></span>
+						<p>更多订单</p>
+					</a>
+				</li>
+			</ul>
+		</div>
+		<!-- 更多链接 -->
+		<div class="user-action">
+			<ul class="action-list">
+				<li><a href="/user/myAddress"><em class="icon icon-add"></em><span>配送地址</span><b></b></a></li>
+				<li><a href="tel:4000024578"><em class="icon icon-service"></em><span>联系客服</span><span class="telno">400-002-4578</span></a></li>
+			</ul>
+		</div>
+		
+		<!-- 退出登陆 -->
+		<div class="box">			
+			<a class="T-btn T-btn-out" href="/logout">退出登陆</a>
+		</div>
+
+		<!-- Footer -->
+		<% include ../template/user_footer %>
+		<!-- script -->
+		<script type="text/javascript">
+			require(['umain'],function (umain) {
+				umain.setOrderBadge();
+			});
+		</script>
+	</body>
+</html>

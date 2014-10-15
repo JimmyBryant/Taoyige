@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<%include ../template/hmeta %>
+	</head>	
+	<body>
+		<header>
+			<div class="user-header">
+				<a href="javascript:;" class="h-left h-back"><span>返回</span></a>
+				<h2>已完成订单</h2>
+				<a href="/" class="h-right h-home"><span>主页</span></a>
+			</div>
+		</header>
+		<%var parseTime=function(t){
+			return t<10?'0'+t:t;
+		}%>
+		<%if(orderlist.length){%>
+		<!--unpaid order list -->
+		<%for(var i=0,len=orderlist.length;i<len;i++){ if(!orderlist[i])continue;var order = orderlist[i];var D = new Date(order.timestamp),y=D.getFullYear(),m=D.getMonth()+1,d=D.getDate(),h=D.getHours(),mi=D.getMinutes(),s=D.getSeconds();var existTime = parseInt(order.timer)+parseInt(order.timestamp)-Date.now();%>
+		<div class="box"> 
+			<dl class="panel panel-default">
+				<dt class="panel-heading clearfix">
+					<span class="left">
+						金额：<em class="order-price">￥<%=order.amount%></em>
+					</span>
+
+					<span class="right time">
+					下单时间：<em><%=y+'-'+parseTime(m)+'-'+parseTime(d)%> <%=parseTime(h)+':'+parseTime(mi)+':'+parseTime(s)%></em>
+					</span>
+				</dt>
+				<dd class="panel-body">
+					<div class="order-info">
+						<p>
+							订单编号：
+							<span class="order-id"><%=order.id%></span>
+						</p>
+						<p>
+							订单状态：
+							<span class="order-id text-warning"> <%=orderStatus[order.status]%> </span>
+						</p>
+					</div>
+					<a class="order-product-thumb" href="/order/details?id=<%=order.id%>">
+						<span class="icon icon-arrow-right"></span>	
+						<img src="<%=order.product.thumbImageUrl[0]%>"/>
+						<span class="order-poduct-info">
+							<%=order.product.title%>
+						</span>						
+					</a>	
+				</dd>
+			</dl>	
+		</div>
+		<%}}else{%>
+			<div class="container">
+				<a href="/" class="T-btn T-btn-red">现在就去淘一个</a>
+			</div>
+		<%}%>
+
+	</body>
+</html>

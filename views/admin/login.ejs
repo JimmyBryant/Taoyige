@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../template/admin_meta %>
+  </head>
+  <body>
+    <% include ../template/admin_header %>
+    <div class="main-content-wrapper">
+      <div class="container">
+        <h1>管理员登录</h1>
+        <form action="/admin/login" method="post">
+
+          <p>账户：<input type="text" name="username"/></p>
+          <p>密码：<input type="password" name="password"/></p>
+          <input type="submit" value="登录"/>
+
+        </form>      
+      </div>      
+    </div>
+  </body>
+</html>

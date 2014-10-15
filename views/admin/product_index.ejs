@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../template/admin_meta %>
+    <title>商品管理</title>
+  </head>
+  <body>
+    <%var nav_index=3;%>
+    <% include ../template/admin_header %>
+    <div class="main-content-wrapper">
+      <div class="container">
+        <ul class="quick-nav clearfix">
+            <li>
+              <a class="btn btn-primary" href="/admin/product/add">发布商品</a>
+            </li>
+        </ul>
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs">
+          <li class="active">
+            <a href="#onsale">出售中的商品</a>
+          </li>
+          <li><a href="/admin/product/ready">排期出售的商品</a></li>
+          <li><a href="/admin/product/store">仓库中的商品</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div class="tab-pane active" id="onsale">
+          <table cellpadding="0" cellspacing="0" class="table table-product">
+            <colgroup>
+              <col width="66px"></col>
+              <col width="205px"></col>
+              <col width="80px"></col>
+              <col width="80px"></col>
+              <col width="80px"></col>
+              <col width="80px"></col>
+            </colgroup>
+          <thead>
+            <tr>
+              <th></th>
+              <th>商品名称</th>
+              <th class="text-right">价格</th>
+              <th class="text-right">原价</th>
+              <th class="text-right">库存</th>
+              <th class="text-right">总销量</th>
+              <th>开售时间</th>
+              <th>结束时间</th>
+              <th>发布时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <% 
+            var parseTime = function(t,num){
+              var num = num||2
+              ,t = t.toString()
+              ;
+              for(;num>t.length;num--){
+              t='0'+t;
+              }
+              return t;
+            }
+          %>
+          <%productlist.forEach(function(val){
+              var product = JSON.parse(val);
+              var D = new Date(product.timestamp),y=D.getFullYear(),m=D.getMonth()+1,d=D.getDate(),h=D.getHours(),mi=D.getMinutes(),s=D.getSeconds();%>
+            <tbody>
+              <tr class="product-bd">
+                <td class="goods">
+                  <a href="#" class="thumb-box"  target="_blank" title="<%=product.title%>">
+                  <img  width="50" height="50" src="<%=product.thumbImageUrl[0]%>">
+                  </a>
+                </td>
+                <td class="title">
+                  <div>
+                    <p>
+                      <a href="/admin/product/edit?id=<%=product.id%>">
+                        <span><%=product.title%></span>
+                      </a>
+                    </p>
+                  </div>
+                </td>
+                <td class="price">
+                  <strong>
+                    ￥<%=product.price%>
+                  </strong>
+                </td>
+                <td class="price">
+                  <strong>￥<%=product.oriPrice%></strong>
+                </td>
+                <td class="text-right">
+                  <span><%=product.count%></span>  
+                </td>
+                <td class="text-right">
+                  <span><%=product.salesVolume%></span>  
+                </td>
+                <td>
+                  <span>
+                    <%=parseTime(new Date(product.saleStartTime).getMonth()+1)%>月<%=parseTime(new Date(product.saleStartTime).getDate())%>日</span>
+
+                    <%=parseTime(new Date(product.saleStartTime).getHours())%>时<%=parseTime(new Date(product.saleStartTime).getMinutes())%>分</span>
+                </td>
+                <td>
+                  <span>
+                    <%=parseTime(new Date(product.saleOffTime).getMonth()+1)%>月<%=parseTime(new Date(product.saleOffTime).getDate())%>日</span>
+
+                    <%=parseTime(new Date(product.saleOffTime).getHours())%>时<%=parseTime(new Date(product.saleOffTime).getMinutes())%>分</span>
+                </td>
+                <td>
+                  <span><%=y+'-'+parseTime(m)+'-'+parseTime(d)%> <%=parseTime(h)+':'+parseTime(m)+':'+parseTime(s)%></span>
+                </td>
+                <td class="operate">
+                  <a class="btn btn-primary" href="/admin/product/edit?id=<%=product.id%>">编辑商品</a>
+                </td>
+              </tr>
+            </tbody>
+          <%});%>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% include ../template/admin_footer %>
+  </body>
+</html>

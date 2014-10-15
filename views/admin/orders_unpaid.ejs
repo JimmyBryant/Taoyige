@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../template/admin_meta %>
+    <title>淘一个——订单管理</title>
+  </head>
+  <body>
+    <%var nav_index=2;%>
+    <% include ../template/admin_header %>
+    <div class="main-content-wrapper">
+      <div class="container">
+        <%
+          var parseTime = function(t,num){
+            var num = num||2
+              ,t = t.toString()
+              ;
+            for(;num>t.length;num--){
+              t='0'+t;
+            }
+            return t;
+          }
+        %>
+        <% var orders_nav='unpaid'; %>
+        <% include ../template/orders_nav %>
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div class="tab-pane active">        
+          <table cellpadding="0" cellspacing="0" class="table table-order">
+          <thead>
+            <tr>
+              <th>商品信息</th>
+              <th>收货人</th>
+              <th>订单金额</th>
+              <th>数量</th>
+              <th>订单状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <%for(var i=0,len=orderlist.length;i<len;i++){var order=orderlist[i];var D = new Date(order.timestamp),y=D.getFullYear(),m=D.getMonth()+1,d=D.getDate(),h=D.getHours(),mi=D.getMinutes(),s=D.getSeconds();%>
+            <tbody>
+              <tr class="order-hd">
+                <td colspan="6">
+                  <span class="dealtime"><%=y+'-'+parseTime(m)+'-'+parseTime(d)%> <%=parseTime(h)+':'+parseTime(m)+':'+parseTime(s)%></span>订单编号：<span class="text-primary"><%=order.id%></span>
+                </td>
+              </tr>
+              <tr class="order-bd">
+                <td class="goods">
+                  <%var product = order.product||{};%>
+                  <div class="thumb-list">
+                  <a href="#" class="thumb-box"  target="_blank" title="<%=product.title%>">
+                  <img  src="<%=product.thumbImageUrl[0]%>">
+                  </a>
+                  <span><%=product.title%></span>
+                  </div>
+                </td>
+                <td>
+                  <span class="text-info"><%=(order.addressInfo&&order.addressInfo.name)%></span>
+                </td>
+                <td class="price">
+                  <span>￥<%=order.amount%></span>
+                </td>
+                <td>
+                  <span><%=order.count%></span>  
+                </td>
+                <td class="status">
+                  <span class="text-info"><%=orderStatus[order.status]%></span> 
+                  <%var expires=parseInt(order.timer)+parseInt(order.timestamp)-Date.now();;%>
+                  <label class="btn-tick time-tick" data-expires="<%=expires%>">
+                  <span class="glyphicon glyphicon-time"></span>
+                  <%var time = expires%>
+                  <em><%if(time<0){%>00:00<%}else{var m=Math.floor(time/60000),s=Math.ceil(time%60000/1000);%><%=parseTime(m)%>:<%=parseTime(s)%><%}%></em>
+                  </label> 
+                </td>
+                <td class="operate">
+                  <a class="btn btn-primary" target="_blank" href="/admin/orders/edit_price?id=<%=order.id%>">
+                    改价
+                  </a>
+                  <a class="btn btn-primary" target="_blank" href="/admin/orders/close?id=<%=order.id%>" onclick="return confirm('确定要关闭该订单？');">
+                    关闭订单
+                  </a>   
+                </td>
+              </tr>
+            </tbody>
+          <%}%>
+          </table>
+          </div>
+        </div>
+        <% include ../template/pagination %>
+      </div>      
+    </div>
+    <!-- script -->
+    <script type="text/javascript">
+      require(['jquery','umain'],function($,main){
+        main.timeTick();
+      })
+    </script>
+  </body>
+</html>

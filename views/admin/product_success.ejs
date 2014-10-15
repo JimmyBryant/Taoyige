@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../template/admin_meta %>
+    <title>商品发布成功</title>
+  </head>
+  <body>
+  <%var nav_index=3;%>
+  <% include ../template/admin_header %>
+	<div class="main-content-wrapper">
+      <div class="container">
+      	<h5>
+      	<%=type==1?'商品发布成功':'商品修改成功'%>
+       ,你现在可以
+      	<a href="/product/details?id=<%=id%>">查看商品详情 </a>
+      	或者 
+      	<a href="/admin/product/edit?id=<%=id%>">编辑商品</a>
+      	</h5>
+      </div>
+     </div>
+  </body>
+ </html>

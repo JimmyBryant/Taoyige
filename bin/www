@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+var debug = require('debug')('TaoOne');
+var cluster = require('cluster');
+var numCPUs = require('os').cpus().length;
+var app = require('../app');
+var config = require('../config');
+app.set('port', process.env.PORT || config.port);
+
+
+if (cluster.isMaster) {
+	// Fork workers.
+	for (var i = 0; i < numCPUs; i++) {
+		cluster.fork();
+	}
+
+	cluster.on('exit', function(worker, code, signal) {
+		console.log('worker ' + worker.process.pid + ' died');
+	});
+
+} else {
+	// Workers can share any TCP connection
+	// In this case its a HTTP server
+	var server = app.listen(app.get('port'), function() {
+	  debug('Express server listening on port ' + server.address().port);
+	});
+}
+

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<%include ../template/hmeta %>
+		<link rel="stylesheet" type="text/css" href="/css/product.css">
+		<title>淘一个</title>
+	</head>	
+	<body class="body-white">		
+		<!-- header -->
+		<header>
+			<div class="user-header">
+				<a href="javascript:;" class="h-left h-back"><span>返回</span></a>
+				<h2>商品详情</h2>
+				<a href="/" class="h-right h-home"><span>首页</span></a>
+			</div>
+		</header>
+		<%if(product){%>
+		<input type="hidden" value="<%=product.id%>" id="today-product-id"/>
+		<div class="product-slider">
+			<ul class="slider-wrapper">
+				<%product.normalImageUrl.forEach(function(val){%>
+				<li class="slider__item">
+					<a href="javascript:;">
+						<img src="<%=val%>"/>
+					</a>
+				</li>
+				<%})%>
+			</ul>
+		</div>
+
+		<div class="product-info">
+			<p class="p-title">
+				<%=product.title%>
+			</p>
+  			<div class="p-action clearfix">
+  				<div class="left">
+  					<label class="p-nowprice">
+  						<strong>￥<%=product.price%></strong>
+  					</label>
+  				</div>
+  				<div class="right">
+  					<label >
+  						<span class="p-price">市场价：<em>￥<%=product.oriPrice%></em></span>
+  						<span class="p-discount">开业营销补贴：<em>￥<%=product.oriPrice-product.price%>
+  						</em>
+  						</span>
+  					</label>
+  				</div>
+  			</div>
+		</div>
+		<%}%>
+		<!-- 商品介绍 -->
+		<div class="product-details">
+			<h2>商品信息</h2>
+			<dl>
+				<dt>
+					主体	
+				</dt>
+				<dd><span>类别：</span>面霜/乳液</dd>
+				<dd><span>品牌：</span>倩碧</dd>
+				<dd><span>适合人群：</span>任何人群</dd>
+				<dd><span>保质期：</span>1095日</dd>
+			</dl>			
+			<dl>
+				<dt>功效</dt>
+				<dd><span>美白淡斑：</span>是</dd>
+			</dl>
+			<dl>
+				<dt>适合肤质</dt>
+				<dd><span>偏油及油性：</span>是</dd>
+				<dd><span>偏干及干性：</span>是</dd>
+				<dd><span>混合型：</span>是</dd>
+				<dd><span>敏感性：</span>是</dd>
+				<dd><span>痘性：</span>是</dd>
+				<dd><span>所有肤质：</span>是</dd>
+			</dl>	
+			<ul class="product-image-list main">
+				<li><img src="http://img20.360buyimg.com/vc/jfs/t250/239/579023179/146054/905aed06/53edbc23N82dc007d.jpg"/>
+				</li>
+				<li><img src="http://img20.360buyimg.com/vc/jfs/t229/320/569078874/41464/62f24d9/53edbc43Nd156a5c9.jpg"/></li>
+				<li><img src="http://img20.360buyimg.com/vc/jfs/t256/26/556836546/358076/81413c56/53edbd48Nbbddb6ed.jpg"></li>
+				<li><img src="http://img20.360buyimg.com/vc/jfs/t232/60/574001672/202845/463f4e46/53edbd64N1dcb652b.jpg"></li>
+				<li><img src="http://img20.360buyimg.com/vc/jfs/t256/209/571771893/170122/d5646f30/53edbd6fN181dcb5c.jpg"></li>
+				<li><img src="http://img20.360buyimg.com/vc/jfs/t220/202/578568254/205942/27316959/53edbd7cNbe08fdd5.jpg"></li>
+				<li><img src="http://img20.360buyimg.com/vc/jfs/t223/196/612861681/114566/fe2713e/53edbd86N6c8ba48d.jpg"></li>
+			</ul>	
+		</div>
+		<!-- shopping now -->
+		<div class="nav-fixed-bottom shopping-action">
+			<div class="left">
+				<p>本场已售数量：<%=product.salesVolume%></p>
+				<p>库存：<%=product.count%></p>
+			</div>
+			<div class="right">
+				<a href="javascript:;" class="btn-shopping-now <%if(product.count<1||product.saleStartTime>Date.now()){%>disable<%}%>">立即闪购</a>
+			</div>
+		</div>
+		<!-- Footer -->
+		<% include ../template/user_footer %>
+		<div style="height:65px;"></div>
+		<!-- script -->
+		<script type="text/javascript">
+			require(['jquery','main','glide'],function($){
+				$('.product-slider').glide({
+					autoplay:false,
+					arrows:false
+				});
+			})
+		</script>
+	</body>
+</html>

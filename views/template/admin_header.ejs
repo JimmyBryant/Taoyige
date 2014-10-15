@@ -1,0 +1,26 @@
+<% var index = 1;
+if(typeof nav_index!='undefined'){
+  index = nav_index;
+}
+%>
+<header class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/admin/index">
+          <strong>淘一个管理后台</strong>
+        </a>
+      </div>
+      <div class="collapse navbar-collapse">
+        <%if(typeof user!='undefined'&&user){%>
+        <div class="navbar-text navbar-right">
+          <span class="margin-lr-medium"><%=user.userName%></span>
+          <a href="/admin/logout">退出</a>
+        </div>
+        <%}%>
+        <ul class="nav navbar-nav">
+          <li <%if(index==2){%>class="active"<%}%>><a href="/admin/orders/index">订单管理</a></li>
+          <li <%if(index==3){%>class="active"<%}%>><a href="/admin/product/index">商品管理</a></li>
+        </ul>
+      </div>
+    </div>
+</header>	

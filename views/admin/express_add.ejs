@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../template/admin_meta %>
+    <title>淘一个——发货</title>
+  </head>
+  <body>
+    <%var nav_index=2;%>
+    <% include ../template/admin_header %>
+    <div class="main-content-wrapper">
+      <div class="container">        
+        <%if(order){%>
+        <%
+          var parseTime = function(t,num){
+            var num = num||2
+              ,t = t.toString()
+              ;
+            for(;num>t.length;num--){
+              t='0'+t;
+            }
+            return t;
+          }
+          var D = new Date(order.timestamp),y=D.getFullYear(),m=D.getMonth()+1,d=D.getDate(),h=D.getHours(),mi=D.getMinutes(),s=D.getSeconds();
+        %>
+        <div class="panel panel-info">
+          <div class="panel-heading">
+            <strong>填写快递信息</strong>
+          </div>
+          <div class="panel-body">
+            <%var product=order.product||{}%>
+            <table class="table table-order">
+              <colgroup>
+                <col width="60px"></col>
+                <col width="300px"></col>
+              </colgroup>
+              <tbody>
+                  <tr class="order-hd">
+                    <td colspan="5">
+                      <span class="dealtime"><%=y+'-'+parseTime(m)+'-'+parseTime(d)%> <%=parseTime(h)+':'+parseTime(m)+':'+parseTime(s)%></span>订单编号：<span class="text-primary"><%=order.id%></span>
+                    </td>
+                  </tr>
+                  <tr class="order-bd">
+                    <td class="goods">
+                      <div class="thumb-list">
+                      <a href="#" class="thumb-box"  target="_blank">
+                      <img src="<%=product.thumbImageUrl[0]%>"/>
+                      </a>                  
+                      </div>
+                    </td>
+                    <td class="title">
+                      <div>
+                        <p>
+                          <a href="/admin/product/edit?id=<%=product.id%>">
+                            <span>
+                              <%=product.title%>
+                            </span>
+                          </a>
+                        </p>
+                      </div>
+                    </td>
+                    <td>
+                      <div>
+                        <%=order.addressInfo.mobilephone%>
+                        <span class="margin-lr-normal">
+                          <%=order.addressInfo.details%>
+                        </span>
+                        <%=order.addressInfo.name%>                        
+                      </div>
+                    </td>
+                    <td class="price">
+                      <span>￥<%=order.amount%></span>
+                    </td>
+                    <td>
+                      <span><%=order.count%></span>  
+                    </td>
+                  </tr>
+                </tbody>
+            </table>
+            <form class="form-deliver-order  form-horizontal" action="/admin/orders/add_express" method="post">
+            <input type="hidden" name="id" value="<%=order.id%>"/>
+            <div class="form-group">
+              <label class="col-sm-2 control-label" for="expressCompany">
+                快递公司：
+              </label>
+              <div class="col-sm-4">
+                <select class="form-control" id="expressCompany" name="expressCompany">
+                    <%for(var i=0,len=mapper.length;i<len;i++){%>
+                    <option value="<%=mapper[i]["code"]%>">
+                     <%=mapper[i]['companyname']%>
+                    </option>
+                    <%}%>
+                </select>   
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label" for="expressNumber">
+                快递单号：
+              </label>
+              <div class="col-sm-4">
+              <input type="text" id="expressNumber" name="expressNumber" class="form-control" placeholder="填写快递单号">
+              </div>
+            </div>
+
+            <div class="form-submit">
+              <button  class="btn btn-primary" type="submit">
+                保存快递信息
+              </button>
+            </div>
+            </form>
+            <%}%>
+        </div>
+      </div>  
+
+      </div>      
+    </div>
+
+  </body>
+</html>

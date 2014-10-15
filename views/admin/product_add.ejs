@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../template/admin_meta %>
+    <title>发布商品</title>
+  </head>
+  <body>
+    <%var nav_index=3;%>
+    <% include ../template/admin_header %>
+    <div class="main-content-wrapper">
+      <div class="container">
+        <div class="panel panel-info">
+          <div class="panel-heading">
+            <strong>填写商品信息</strong>
+          </div>
+          <div class="panel-body">
+            <form id="form-product" class="form-horizontal" action="/admin/product/add" method="post">
+              <h5 class="section-title">1.商品信息</h5>
+              <input id="normalImageUrl" name="normalImageUrl" type="hidden" value=''/>
+              <input id="bannerImageUrl" name="bannerImageUrl" type="hidden" value=''/>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">商品标题：</label>
+                <div class="col-sm-6">
+                  <input name="title" type="text" class="form-control" data-validate="product-title"/>
+                </div>              
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">商品售价：</label>
+                <div class="col-sm-2">
+                <input name="price" id="price" type="text" class="form-control"  data-validate="product-price"/>
+                <span class="text-unit">元</span>
+                </div> 
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">商品原价：</label>
+                <div class="col-sm-2">
+                <input name="oriPrice" id="oriPrice" type="text" class="form-control" />
+                <span class="text-unit">元</span>
+                </div>
+              </div>
+              <div class="form-group">
+               <label class="col-sm-2 control-label">商品数量：</label>
+               <div class="col-sm-2">
+                <input name="count" type="text" class="form-control"/>
+                <span class="text-unit">件</span>
+                </div>
+              </div>
+              <div class="form-group">
+               <label class="col-sm-2 control-label">商品图片：</label>
+               <div class="col-sm-7">
+                  <div class="padding-medium">
+                    <span>
+                      选择本地图片
+                      <sub class="text-danger">
+                        商品图片素材尺寸必须大于640x640，大小在50K以内,仅限jpg,jpeg,png格式的图片
+                      </sub>
+                    </span>
+                    <input type="file" name="productImage" id="productImage"/>
+                  </div>
+                  <ul class="thumb-preview-list clearfix">
+                    <li class="thumb-main">
+                      <span class="text-info">商品主图</span>
+                    </li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="form-group">
+               <label class="col-sm-2 control-label">横幅图片：</label>
+               <div class="col-sm-7">
+                  <div class="padding-medium">
+                    <span>
+                      选择本地图片
+                      <sub class="text-danger">
+                        横幅图片素材尺寸最好保持640x120，大小在50K以内,仅限jpg,jpeg,png格式的图片
+                      </sub>
+                    </span>
+                    <input type="file" name="productBanner" id="productBanner"/>
+                  </div>
+                  <div class="banner-preview">
+
+                  </div>
+                </div>
+              </div>
+              <h5 class="section-title">2.商品物流费用</h5>
+              <div class="form-group">
+               <label class="col-sm-2 control-label">商品运费：</label>
+               <div class="col-sm-1">
+                <input name="freight" type="text" class="form-control" value="0" disabled/>
+                <span class="text-unit">元</span>
+                </div>
+              </div>
+              <h5 class="section-title">3.其他信息</h5>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">上架时间：</label>
+                <div class="col-sm-2">
+                  <ul class="form-verticle-list">
+                    <li>
+                    <label class="radio-inline">
+                      <input type="radio" value="1" name="startType" checked> 放入仓库
+                    </label>
+                    </li>
+                    <li>
+                    <label class="radio-inline">
+                      <input type="radio" value="2" name="startType">设定时间
+                    </label>
+                    <label class="select-inline">
+                      <select name="startDate">
+                      <%idleArr.forEach(function(val){var now = Date.now(),D=new Date(now+val*24*3600*1000);%>
+                        <option value="<%=val%>">
+                          <%=D.getFullYear()+'年'+(D.getMonth()+1)+'月'+D.getDate()+'日'%>
+                        </option>
+                      <%})%>
+                      </select>
+                    </label>
+                    </li>
+                    <li>
+                    <li>
+                    <label class="radio-inline">
+                      <input type="radio" value="3" name="startType"> 立即开始
+                    </label>
+                    </li>
+                    <li>
+                      
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">开抢时间：</label>
+                <div class="col-sm-1">
+                <select class="form-control" id="startHour" name="startHour">
+                  <%for(var i=8;i<=24;i++){%>
+                  <option value="<%=i%>"><%=i%></option>
+                  <%}%>
+                </select>
+                <span class="text-unit">时</span>
+                </div>
+                <div class="col-sm-1">
+                <select class="form-control" id="startMinute" name="startMinute">
+                  <option value="0">00</option>
+                  <option value="0">15</option>
+                  <option value="30">30</option>                  
+                </select>
+                <span class="text-unit">分</span>
+                </div>
+              </div>
+              <div class="form-submit">
+
+                <button type="submit" class="btn btn-primary" id="btn-product-submit">
+                  发布商品
+                </button>
+
+              </div>
+              
+
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <% include ../template/admin_footer %>
+    <!-- script here  -->
+    <script type="text/javascript">
+      require(['jquery','admin.main'],function($,main){
+        main.validate($('#form-product'));
+        $('#productImage').on('change',function(){
+          if($(this).val())
+            main.uploadImage();
+        })
+        $('#productBanner').on('change',function(){
+            if($(this).val()){
+              main.uploadBanner();
+            }
+        })
+      })
+    </script>
+  </body>
+</html>

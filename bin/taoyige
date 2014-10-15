@@ -1,0 +1,29 @@
+#! /bin/sh
+APP_PATH=/instreet/cluster/taoyige/TaoOne
+APP=$APP_PATH/bin/www
+APP_NAME=Taoyige
+LOGFILE=/dev/null
+LOGPATH=$APP_PATH/log
+PID=$APP_PATH/bin/taoyige_forever.pid
+FE=$APP_PATH/node_modules/forever/bin/forever
+#FE=/usr/local/softs/common/node_js_0_10_18/bin/forever
+
+case "$1" in
+        "start")
+                echo "Starting $APP_NAME: "
+		$FE -p $APP_PATH -l $LOGFILE -e $LOGFILE -o $LOGFILE -a --pidFile $PID start $APP
+                ;;
+        "stop")
+                echo "Stopping $APPA_NAME: "
+		$FE  stop $APP 
+                ;;
+	"restart")
+                echo "Restarting $APP_NAME: "
+                $FE -p $APP_PATH -l $LOGFILE -e $LOGFILE -o $LOGFILE -a  --pidFile $PID restart $APP                                                                 	             
+		;;
+	"clean")
+                echo "Cleanuping $APP_NAME: "
+                rm -rf $LOGPATH/*.log
+                ;;	
+esac
+exit 0
