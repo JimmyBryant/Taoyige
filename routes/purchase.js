@@ -4,6 +4,7 @@ var userManager = require('../base/userManager')
 	,orderManager = require('../base/orderManager')
 	,orderStatus = orderManager.orderStatus
 	,productManager = require('../base/productManager')
+	,productStatus = productManager.productStatus
 	,service = require('../base/thirdService')
 	,_ = require('underscore')
 	,DOMParser = require('xmldom').DOMParser
@@ -47,9 +48,10 @@ var actions = {
 						})
 					}else{
 						var product = JSON.parse(replies)
-							now = Date.now();
+							now = Date.now()
+							;
 						// 先判断该商品是否正在销售
-						if(product.startType==3&&product.saleStartTime<now&&product.saleOffTime>now){
+						if(product.status==productStatus.onSale&&product.saleStartTime<now&&product.saleOffTime>now){
 							if(product.count<count){	//商品数量不够
 								res.send({
 									err:error.soldOut
@@ -235,7 +237,7 @@ var actions = {
 	},
 	// 支付失败跳转
 	backto_merchant: function(req,res){
-
+		res.redirect('/user/home')
 	}
 }
 

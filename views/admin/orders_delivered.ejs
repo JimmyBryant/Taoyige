@@ -5,7 +5,7 @@
     <title>淘一个——订单管理</title>
   </head>
   <body>
-    <%var nav_index=2;%>
+    <%var nav_index=1;%>
     <% include ../template/admin_header %>
     <div class="main-content-wrapper">
       <div class="container">
@@ -19,6 +19,16 @@
             }
             return t;
           }
+          var getLocalFormat = function(date){
+              var y=date.getFullYear()
+                  ,m=date.getMonth()+1
+                  ,d=date.getDate()
+                  ,h=date.getHours()
+                  ,mi=date.getMinutes()
+                  ,s=date.getSeconds()
+                ;
+              return y+'-'+parseTime(m)+'-'+parseTime(d)+' '+parseTime(h)+':'+parseTime(mi)+':'+parseTime(s)
+          }          
         %>
         <% var orders_nav='delivered'; %>
         <% include ../template/orders_nav %>
@@ -36,11 +46,19 @@
               <th>操作</th>
             </tr>
           </thead>
-          <%for(var i=0,len=orderlist.length;i<len;i++){var order=orderlist[i];var D = new Date(order.timestamp),y=D.getFullYear(),m=D.getMonth()+1,d=D.getDate(),h=D.getHours(),mi=D.getMinutes(),s=D.getSeconds();%>
+          <%for(var i=0,len=orderlist.length;i<len;i++){var order=orderlist[i];var D = new Date(order.timestamp);%>
             <tbody>
               <tr class="order-hd">
                 <td colspan="6">
-                  <span class="dealtime"><%=y+'-'+parseTime(m)+'-'+parseTime(d)%> <%=parseTime(h)+':'+parseTime(m)+':'+parseTime(s)%></span>订单编号：<span class="text-primary"><%=order.id%></span>
+                  <span>
+                    <%=i+1%>
+                  </span>
+                  订单编号：
+                  <span class="text-primary"><%=order.id%></span>
+                  <span class="dealtime"><%=getLocalFormat(D)%></span>
+                  <label class="fr">
+                    用户：<a href="#"><%=order.user.userName%></a>
+                  </label>                  
                 </td>
               </tr>
               <tr class="order-bd">

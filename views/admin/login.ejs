@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <% include ../template/admin_meta %>
+    <link rel="stylesheet" type="text/css" href="<%=global.appConfig.admin_host%>/js/bootstrap/css/bootstrap.css">  
+    <link rel="stylesheet" type="text/css" href="<%=global.appConfig.admin_host%>/css/admin.css"> 
+    <script type="text/javascript" src="<%=global.appConfig.admin_host%>/js/require.min.js">
+    </script>
+    <script type="text/javascript" src="<%=global.appConfig.admin_host%>/js/require.config.js">
+    </script>
   </head>
   <body>
     <% include ../template/admin_header %>

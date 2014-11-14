@@ -19,6 +19,7 @@
               <h5 class="section-title">1.商品信息</h5>
               <input id="id" name="id" type="hidden" value='<%=product.id%>'/>
               <input id="normalImageUrl" name="normalImageUrl" type="hidden" value='<%=product.normalImageUrl.join(",")%>'/>
+              <input id="detailsImageUrl" name="detailsImageUrl" type="hidden" value="<%=product.detailsImageUrl?product.detailsImageUrl.join(','):''%>"/>
               <input id="bannerImageUrl" name="bannerImageUrl" type="hidden" value='<%=product.bannerUrl%>'/>              
               <div class="form-group">
                 <label class="col-sm-2 control-label">商品标题：</label>
@@ -47,13 +48,13 @@
                 <span class="text-unit">件</span>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="form-group" id="image-group">
                <label class="col-sm-2 control-label">商品图片：</label>
                <div class="col-sm-7">
                   <div class="padding-medium">
                     <span>选择本地图片                      
                       <sub class="text-danger">
-                        商品图片素材尺寸必须大于640x640，大小在50K以内,仅限jpg,jpeg,png格式的图片
+                        商品图片素材尺寸必须大于640x640，大小在500K以内,仅限jpg,jpeg,png格式的图片
                       </sub>
                     </span>
                     <input type="file" name="productImage" id="productImage"/>
@@ -61,7 +62,7 @@
                   <ul class="thumb-preview-list clearfix">
                     <%for(var i=0;i<5;i++){
                       if(i==0){%>
-                      <li class="thumb-main">
+                      <li class="thumb-main" data-index="<%=i%>">
                         <%if(product.normalImageUrl[i]){%>
                         <a class="thumb"><img src="<%=product.normalImageUrl[i]%>"><span title="移除" class="remove-preview glyphicon glyphicon-remove"></span></a>
                         <%}else{%>
@@ -69,7 +70,7 @@
                         <%}%>
                       </li>
                      <% }else{%>
-                      <li> 
+                      <li data-index="<%=i%>"> 
                         <%if(product.normalImageUrl[i]){%>
                         <a class="thumb"><img src="<%=product.normalImageUrl[i]%>"><span title="移除" class="remove-preview glyphicon glyphicon-remove"></span></a>
                         <%}%>
@@ -86,7 +87,7 @@
                     <span>
                       选择本地图片
                       <sub class="text-danger">
-                        横幅图片素材尺寸最好保持640x120，大小在50K以内,仅限jpg,jpeg,png格式的图片
+                        横幅图片素材尺寸最好保持640x120，大小在500K以内,仅限jpg,jpeg,png格式的图片
                       </sub>
                     </span>
                     <input type="file" name="productBanner" id="productBanner"/>
@@ -98,6 +99,28 @@
                       </a>
                     <%}%>
                   </div>
+                </div>
+              </div>
+              <div class="form-group" id="details-image-group">
+               <label class="col-sm-2 control-label">详情大图：</label>
+               <div class="col-sm-7">
+                  <div class="padding-medium">
+                    <span>选择本地图片                      
+                      <sub class="text-danger">
+                        商品详情大图宽度必须大于620px,高度不限,仅限jpg,jpeg,png格式的图片
+                      </sub>
+                    </span>
+                    <input type="file" name="productDetailsImage" id="productDetailsImage"/>
+                  </div>
+                  <ul class="thumb-preview-list clearfix">
+                    <%for(var i=0;i<10;i++){%>
+                      <li data-index="<%=i%>"> 
+                        <%if(product.detailsImageUrl&&product.detailsImageUrl[i]){%>
+                        <a class="thumb"><img src="<%=product.detailsImageUrl[i]%>"><span title="移除" class="remove-preview glyphicon glyphicon-remove"></span></a>
+                        <%}%>
+                      </li>                     
+                    <%}%>
+                  </ul>
                 </div>
               </div>
               <h5 class="section-title">2.商品物流费用</h5>
@@ -115,17 +138,17 @@
                   <ul class="form-verticle-list">
                     <li>
                     <label class="radio-inline">
-                      <input type="radio" value="1" name="startType" <%if(product.startType==1){%>checked<%}%>> 放入仓库
+                      <input type="radio" value="1" name="status" <%if(product.status==1){%>checked<%}%>> 放入仓库
                     </label>
                     </li>
                     <li>
                     <label class="radio-inline">
-                      <input type="radio" value="2" name="startType" <%if(product.startType==2){%>checked<%}%>>设定时间
+                      <input type="radio" value="2" name="status" <%if(product.status==2){%>checked<%}%>>设定时间
                     </label>
                     <label class="select-inline">
                       <select name="startDate">
                       <%idleArr.forEach(function(val){var now = Date.now(),D=new Date(now+val*24*3600*1000);%>
-                        <option value="<%=val%>" <%if(product.saleStartTime>Date.now()&&(new Date(product.saleStartTime).getDate()-new Date().getDate())==val){%>selected=""<%}%>>
+                        <option value="<%=val%>" <%if(product.saleStartTime>Date.now()&&(new Date(product.saleStartTime).getDate()-new Date().getDate())==val){%>selected="true"<%}%>>
                           <%=D.getFullYear()+'年'+(D.getMonth()+1)+'月'+D.getDate()+'日'%>
                         </option>
                       <%})%>
@@ -135,7 +158,7 @@
                     <li>
                     <li>
                     <label class="radio-inline">
-                      <input type="radio" value="3" name="startType" <%if(product.startType==3){%>checked<%}%>> 立即开始
+                      <input type="radio" value="3" name="status" <%if(product.status==3){%>checked<%}%>> 立即开始
                     </label>
                     </li>
                     <li>
@@ -146,21 +169,21 @@
               </div>
               <div class="form-group">
                 <label class="col-sm-2 control-label">开抢时间：</label>
-                <div class="col-sm-1">
-                <select class="form-control" id="startHour" name="startHour">
-                  <%for(var i=8;i<=24;i++){%>
-                  <option value="<%=i%>" <%if(product.saleStartTime&&new Date(product.saleStartTime).getHours()==i){%>selected<%}%>><%=i%></option>
-                  <%}%>
-                </select>
-                <span class="text-unit">时</span>
-                </div>
-                <div class="col-sm-1">
-                <select class="form-control" id="startMinute" name="startMinute">
-                  <option value="0" <%if(new Date(product.saleStartTime).getMinutes()==0){%>selected<%}%>>00</option>
-                  <option value="15" <%if(new Date(product.saleStartTime).getMinutes()==15){%>selected<%}%>>15</option>
-                  <option value="30" <%if(new Date(product.saleStartTime).getMinutes()==30){%>selected<%}%>>30</option>                  
-                </select>
-                <span class="text-unit">分</span>
+                <div class="col-sm-6">
+                  <div class="control-select">
+                    <select id="startHour" name="startHour">
+                    <%for(var i=0;i<=24;i++){%>
+                    <option value="<%=i%>" <%if(product.saleStartTime&&new Date(product.saleStartTime).getHours()==i){%>selected="true"<%}%>><%=i%></option>
+                    <%}%>
+                    </select>
+                    <span>时</span>
+                    <select id="startMinute" name="startMinute">
+                    <option value="0" <%if(new Date(product.saleStartTime).getMinutes()==0){%>selected="true"<%}%>>00</option>
+                    <option value="15" <%if(new Date(product.saleStartTime).getMinutes()==15){%>selected="true"<%}%>>15</option>
+                    <option value="30" <%if(new Date(product.saleStartTime).getMinutes()==30){%>selected="true"<%}%>>30</option>                  
+                    </select>
+                    <span>分</span>
+                    </div>
                 </div>
               </div>
               <div class="form-submit">
@@ -183,10 +206,15 @@
       require(['jquery','admin.main'],function($,main){
         main.validate($('#form-product'));
         main.productImagesUrl = '<%=product.normalImageUrl%>'.split(',');
+        main.productDetailsImagesUrl = '<%=product.detailsImageUrl||""%>'.split(',');
         main.productBannerUrl = '<%=product.bannerUrl%>';
         $('#productImage').on('change',function(){
           if($(this).val())
             main.uploadImage();
+        })
+        $('#productDetailsImage').on('change',function(){
+          if($(this).val())
+            main.uploadDetails();
         })
         $('#productBanner').on('change',function(){
             if($(this).val()){

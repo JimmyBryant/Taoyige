@@ -39,13 +39,25 @@ body{
 .user-info{
 	margin:@medium @large;
 	font-size:@font_medium;
-	.icon-alipay{
-		width: @icon_normal;
-		height: @icon_normal;
-		margin-left: 0 @normal;
-		background: url(../images/logo/alipay_logo.png) no-repeat;
-		background-size: @icon_normal;
+	.icon-small{
+		background: #ff9e07 url(../images/bg/login_icons.png) no-repeat;
+		display: inline-block;
+		width: 20px;
+		height: 20px;
+		vertical-align: middle;
+		background-size: 20px;
+		font-size: 0;
+		.border-radius(4px,4px,4px,4px);
 	}
+	.icon-small-qq{
+		background-position: 0 0;	
+	}
+	.icon-small-alipay{
+		background-position: 0 -20px;
+	}
+	.icon-small-weibo{
+		background-position: 0 -40px;
+	}	
 }
 
 .quick-nav{
@@ -197,5 +209,23 @@ body{
 			background: @base_col1;
 			color: #fff;
 		}
+	}
+}
+#loading-statusbar{
+	text-align: center;
+	padding:@small;
+	margin-bottom:@normal;
+	font-size:@font_small;
+	color:gray;
+	i{
+		display: none;
+		width: 16px;
+		height: 16px;
+		vertical-align: middle;
+		background: url(../images/loading_16x16.gif);
+		margin-right: @small;		
+	}
+	i.show{
+		display:inline-block;
 	}
 }

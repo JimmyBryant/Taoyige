@@ -14,11 +14,21 @@
 		<div class="container bg-white">
 			<div class="login-box">
 				<h1>
-					请使用支付宝账户登录<a class="icon icon-alipay" href="/loginRedirect"></a>
-				</h1>	
+					请使用以下合作平台帐号登录：
+				</h1>
+				<a class="icon icon-qq" href="/loginRedirect?p=qq">
+					QQ帐号登录
+				</a>
+				<a class="icon icon-weibo" href="/loginRedirect?p=weibo">
+					新浪微博登录
+				</a>
+				<a class="icon icon-alipay" href="/loginRedirect?p=alipay">
+					支付宝快捷登录
+				</a>	
 			</div>
 		</div>
 		<!-- Footer -->
 		<% include template/user_footer %>
+		<!-- script here -->
 	</body>
 </html>

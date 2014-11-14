@@ -1,7 +1,10 @@
 module.exports = {
-	"host":"http://taoyige.com:3001",
-	"shost":"http://taoyige.com:3001",
+	"host":"http://192.168.1.108:3001",
+	"shost":"http://192.168.1.108:3001",
+	"mhost":"http://192.168.1.108:3001/welcome",	//触屏版域名
+	"admin_host":"http://192.168.1.108:3001",
 	"port":"3001",
+	"env":"development",
 	"redis":{
 		"host":"192.168.1.200",
 		"port":"6380"

@@ -39,7 +39,12 @@
 							<span class="order-id text-warning">
 							 <%=orderStatus[order.status]%> 
 							</span>
+							<%if(order.status==orderStatus.delivered||order.status==orderStatus.checked){%>
 							<%if(order.status==orderStatus.delivered){%>
+								<a href="javascript:;" class="btn btn-primary btn-check" data-id="<%=order.id%>">
+									确认收货
+								</a>
+							<%}%>
 							<a href="/order/track?id=<%=order.id%>" class="btn btn-info btn-paynow">
 								跟踪订单
 							</a>
@@ -64,6 +69,7 @@
 		<!-- script -->
 		<script type="text/javascript">
 			require(['jquery','umain'],function($,main){
+				main.checkOder();
 				main.timeTick();
 			})
 		</script>

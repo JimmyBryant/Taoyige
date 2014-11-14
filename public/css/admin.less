@@ -16,6 +16,9 @@ a:hover{
 	padding:6px 12px;
 	font-size:14px;
 }
+.fr{
+	float:right;
+}
 .padding-medium{
 	padding:@medium;
 }
@@ -90,7 +93,7 @@ a:hover{
 	}
 	.dealtime{
 		font-family: verdana;
-		margin-right:@normal;
+		margin:0 @normal;
 	}
 	.order-hd td,.order-bd td{
 		border:1px solid #ddd;
@@ -135,6 +138,9 @@ form{
 	position:absolute;
 	top:8px;
 	right:-4px;
+}
+.form-group .control-select{
+	margin-top:7px;
 }
 .banner-preview{
 	width:640px;
@@ -192,6 +198,52 @@ form{
 		}
 	}
 }
+#details-image-group {
+	.thumb-preview-list li{
+		height:183px;
+		margin-bottom:@medium;
+	}
+	.thumb-preview-list li .thumb{
+		height:180px;
+	}
+}
+.operate-tool{
+	display:none;
+	position:absolute;
+	right:@small;
+	top:@small;
+	a{
+		text-decoration:none;
+	}	
+}
+.custom-info-list{
+	background:#FFF503;
+	margin: 0 10% @medium;
+	dd{
+		position:relative;
+		padding:@small @normal;
+		border-bottom:1px dashed #F36608;
+		em{
+			color:#888;
+			padding:0 @normal;
+		}
+		a{
+			text-decoration:none;
+		}
+	}
+	.edit-box{
+		display:none;
+	}
+	.btn-ok{
+		color:green;
+	}
+	.btn-cancel,.btn-delete{
+		color:red;
+	}
+}
+.order-search-field{
+	padding:@medium;
+}
 .form-submit{
 	text-align: center;
 	padding:@normal @medium;
@@ -208,6 +260,9 @@ form{
 	.page-number{
 
 	}
+}
+.time-tick-danger{
+	color:red;
 }
 /* footer */
 footer{

@@ -15,11 +15,18 @@ var user = {
 	addressID:''	//默认收货地址ID
 }
 
+var loginPlatform = {
+	'alipay':1,
+	'weibo':'2',
+	'qq':'3'
+}
+
 var userKey = redisKey.user	
 	,userCount = redisKey.userCount
 	;
 
 module.exports = {
+	"loginPlatform": loginPlatform,
 	//判断用户是否存在
 	isExistUser : function(uid,callback){	
 		if(uid){

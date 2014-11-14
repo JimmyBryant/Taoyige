@@ -2,6 +2,14 @@ var redisCli = require('./redisCli')
 	,redisKey = require('./redisKey')
 	,_ = require('underscore')
 	;
+
+//商品Status Object
+var productStatus = {
+	"store": 1,	// 仓库中
+	"ready": 2,	// 排期上架销售
+	"onSale": 3	// 销售中
+}
+
 //商品对象
 var product = {
 	id:'',
@@ -15,13 +23,15 @@ var product = {
 	largeImageUrl:[],
 	normalImageUrl:[],
 	thumbImageUrl:[],
+	detailsImageUrl:[],//商品详情大图
 	bannerUrl:'',	//首页展示的banner图片地址
 	freight:0,	//商品运费，默认0
 	timestamp:'',
-	startType:1,	//商品发布类型 1 放入仓库 2 排期上架销售 3 立即上架销售	
+	status:productStatus.store,	//商品状态 1 放入仓库 2 排期上架销售 3 立即上架销售	
 	saleStartTime:'',	//商品开始销售时间
 	saleOffTime:''	//商品下架时间
 }
+
 
 var productKey = redisKey.product
 	,productCountKey = redisKey.productCount
@@ -30,6 +40,7 @@ var productKey = redisKey.product
 	,storeKey = redisKey.productStore
 	;
 module.exports = {
+	productStatus: productStatus,
 	/* 
 	*	添加商品
 	* @param obj是商品对象 type 是商品开始类型 1=放入仓库 2=设置开始时间 3=立即开始
@@ -41,7 +52,7 @@ module.exports = {
 					callback(err)
 				}else{
 					var id = replies
-						,type = obj.startType
+						,status = obj.status
 						;
 					_.map(product,function(val,key){
 						if(obj[key]!=undefined)
@@ -51,12 +62,16 @@ module.exports = {
 					product.timestamp = Date.now();
 					var multi = redisCli.multi();
 					
-					if(type==1){	// 将商品放入仓库
+					if(status == productStatus.store){	// 将商品放入仓库
 						multi.rpush(storeKey,id);
-					}else if(type==2){	//预定日期销售	
-						var date = new Date(product.saleStartTime).getDate();
-						multi.hset(readyKey,date,id)
-					}else if(type==3){	//立即投放，重新设置onsale key的value
+					}else if(status == productStatus.ready){	//预定日期销售
+						var dateStr = new Date(product.saleStartTime).toDateString();	
+						var dateTime = new Date(dateStr).getTime();
+						// 获取该日期下排期的商品ID
+						multi.hget(readyKey,dateTime);
+						// 设置商品排期日期
+						multi.hset(readyKey,dateTime,id);
+					}else if(status == productStatus.onSale){	//立即投放，重新设置onsale key的value
 						// 获取正在销售的商品ID
 						multi.get(saleKey);
 						multi.set(saleKey,id);
@@ -67,9 +82,13 @@ module.exports = {
 								callback(err)
 							}else{	
 								// 将下架的商品放置到仓库中
-								if(type==3&&replies[0]){
-									redisCli.rpush(storeKey,replies[0],function(err,replies){
-										callback(null,product.id)
+								// 并且要修改该商品的status
+								var prev_saleID = replies[0];
+								if((status == productStatus.onSale||status == productStatus.ready)&&prev_saleID){
+									setProductStatus(prev_saleID,productStatus.store,function(err,replies){
+										redisCli.lpush(storeKey,prev_saleID,function(err,replies){
+											callback(null,product.id)
+										})
 									})
 								}else{
 									callback(null,product.id)
@@ -91,8 +110,10 @@ module.exports = {
 				}else{
 					var product = JSON.parse(replies)
 						,date = new Date(product.saleStartTime).getDate()
-						,prev_type = product.startType
-						,type = obj.startType
+						,dateStr = new Date(product.saleStartTime).toDateString()
+						,dateTime = new Date(dateStr).getTime()
+						,prev_status = product.status
+						,status = obj.status
 						;					
 					_.map(obj,function(val,key){
 						if(key!='id'&&key!='timestamp'){	//商品id和时间戳不能修改							
@@ -100,21 +121,27 @@ module.exports = {
 						}
 					});
 					var multi = redisCli.multi();
-		
-					if(prev_type==1){
+					if(prev_status == productStatus.store){
 						multi.lrem(storeKey,0,product.id)
-					}if(prev_type==2){	//从排期队列中移除
-						multi.hdel(readyKey,date);
-					}else if(prev_type==3){
+					}if(prev_status == productStatus.ready){// 删除该日期下排期的商品
+						multi.hdel(readyKey,dateTime);	
+					}else if(prev_status == productStatus.onSale){ // 删除正在销售的商品
 						multi.del(saleKey)
 					}
 
-					if(type==1){	// 将商品放入仓库
-						multi.rpush(storeKey,id);
-					}else if(type==2){	//排期销售	
-						var new_date = new Date(product.saleStartTime).getDate();
-						multi.hset(readyKey,new_date,id)
-					}else if(type==3){	//立即投放，重新设置onsale key的value
+					if(status == productStatus.store){	// 将商品放入仓库
+						multi.lpush(storeKey,id);
+					}else if(status == productStatus.ready){	//排期销售	
+						var new_dateStr = new Date(product.saleStartTime).toDateString();
+						var new_dateTime = new Date(new_dateStr).getTime();
+						console.log(new_dateStr,new_dateTime)
+						// 获取该日期下排期的商品ID
+						multi.hget(readyKey,new_dateTime);
+						// 设置该商品排期销售
+						multi.hset(readyKey,new_dateTime,id)
+					}else if(status == productStatus.onSale){	//立即投放，重新设置onsale key的	
+						// 获取正在销售的商品ID
+						multi.get(saleKey);
 						multi.set(saleKey,id);
 					}
 					
@@ -122,7 +149,18 @@ module.exports = {
 						if(err){
 							callback(err)
 						}else{
-							callback(null,product.id)
+							// 将下架的商品放置到仓库中
+							//replies[1]是下架商品的ID
+							var prev_saleID = replies[1];
+							if((status==productStatus.onSale||status==productStatus.ready)&&prev_saleID&&prev_saleID!=id){
+								setProductStatus(prev_saleID,productStatus.store,function(){
+									redisCli.lpush(storeKey,prev_saleID,function(err,replies){
+										callback(null,product.id)
+									})
+								})
+							}else{
+								callback(null,product.id)
+							}							
 						}
 					})
 				}
@@ -243,15 +281,17 @@ module.exports = {
 	},
 	// 获取ready sale keys
 	getReadyKeys: function(callback){
+		// 获取所有排期上架的key
 		redisCli.hkeys(readyKey,function(err,replies){
 			if(err){
 				callback(err)
 			}else{
 				var readyArr = [];				
 				_.each(replies,function(val){
-					var date = new Date().getDate();
-					if((parseInt(val)-date)>0){
-						readyArr.push(parseInt(val)-date)
+					var now = Date.now();
+					// 过滤掉很早的排期
+					if(parseInt(val)>now){
+						readyArr.push(val)
 					}
 				})
 				callback(null,readyArr);
@@ -290,20 +330,21 @@ module.exports = {
 						// 如果商品销售时间未到期
 						if(product.saleOffTime>Date.now()){
 							callback(null,product);
-						}else{	//商品销售时间到期
-							//到期后将商品移动到仓库,并且清除sale,修改startType
-							product.startType = 1;	//1表示放入仓库
+						}else{	
+							//商品销售时间到期
+							//到期后将商品移动到仓库,并且清除onSale,修改status为store
+							product.status = productStatus.store;	
 							var multi = redisCli.multi();
 							multi.rpush(storeKey,product.id)
 							.del(saleKey)
 							.hset(productKey,product.id,JSON.stringify(product))
 							.exec(function(err,replies){
-									if(err){
-										callback(err)
-									}else{
-										getSaleFromReady(callback);
-									}
-								})
+								if(err){
+									callback(err)
+								}else{
+									getSaleFromReady(callback);
+								}
+							})
 							
 						}
 					})
@@ -317,29 +358,32 @@ module.exports = {
 							callback(err)
 						}else{
 							var date = new Date().getDate().toString();	
+							// 获取排期为当日的商品ID
 							if(_.contains(replies,date)){
 								redisCli.hget(readyKey,date,function(err,replies){
 									if(err){
 										callback(err)
 									}else{
 										var id = replies;
-										var multi = redisCli.multi();
-										multi.hdel(readyKey,date).set(saleKey,id).hget(productKey,id)
-										.exec(function(err,replies){
+										// 修改商品状态为onSale，成功后返回Product Object
+										setProductStatus(id,productStatus.onSale,function(err,replies){
 											if(err){
 												callback(err)
 											}else{
-												var product =  JSON.parse(replies[2]);
-												product.startType = 3;	//商品类型修改为立即开始
-												redisCli.hset(productCountKey,id,JSON.stringify(product),function(err,replies){
+												var product = replies;
+												// 从排期队列中删除该商品
+												// 将该商品设置为销售中的商品
+												var multi = redisCli.multi();										
+												multi.hdel(readyKey,date).set(saleKey,id)
+												.exec(function(err,replies){
 													if(err){
-														console.log(err,'set product startType error')
+														callback(err)
+													}else{
+														callback(null,product)
 													}
-												})
-												callback(null,product)
+												});												
 											}
-										});
-										
+										});										
 									}
 								})
 							}else{
@@ -431,3 +475,26 @@ var getProduct = function(id,callback){
 		callback('商品ID不能为空')
 	}
 } 
+
+// 设置商品状态
+var setProductStatus= function(id,status,callback){
+	if(id){
+		getProduct(id,function(err,replies){
+			if(err){
+				callback(err)
+			}else{
+				var product = JSON.parse(replies);
+				product.status = status;
+				redisCli.hset(productKey,product.id,JSON.stringify(product),function(err,replies){
+					if(err){
+						callback(err)
+					}else{
+						callback(null,product)
+					}
+				})
+			}
+		})
+	}else{
+		callback('无法设置status')
+	}		
+}

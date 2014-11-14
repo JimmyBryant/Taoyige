@@ -17,6 +17,7 @@
             <form id="form-product" class="form-horizontal" action="/admin/product/add" method="post">
               <h5 class="section-title">1.商品信息</h5>
               <input id="normalImageUrl" name="normalImageUrl" type="hidden" value=''/>
+              <input id="detailsImageUrl" name="detailsImageUrl" type="hidden" value=''/>
               <input id="bannerImageUrl" name="bannerImageUrl" type="hidden" value=''/>
               <div class="form-group">
                 <label class="col-sm-2 control-label">商品标题：</label>
@@ -45,26 +46,28 @@
                 <span class="text-unit">件</span>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="form-group" id="image-group">
                <label class="col-sm-2 control-label">商品图片：</label>
                <div class="col-sm-7">
                   <div class="padding-medium">
                     <span>
                       选择本地图片
                       <sub class="text-danger">
-                        商品图片素材尺寸必须大于640x640，大小在50K以内,仅限jpg,jpeg,png格式的图片
+                        商品图片素材尺寸必须大于640x640，大小在500K以内,仅限jpg,jpeg,png格式的图片
                       </sub>
                     </span>
                     <input type="file" name="productImage" id="productImage"/>
                   </div>
                   <ul class="thumb-preview-list clearfix">
-                    <li class="thumb-main">
-                      <span class="text-info">商品主图</span>
-                    </li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
+                    <%for(var i=0;i<5;i++){
+                      if(i==0){%>
+                        <li class="thumb-main">
+                          <span class="text-info">商品主图</span>
+                        </li>
+                    <%}else{%>
+                        <li></li>
+                    <%}
+                    }%>
                   </ul>
                 </div>
               </div>
@@ -75,7 +78,7 @@
                     <span>
                       选择本地图片
                       <sub class="text-danger">
-                        横幅图片素材尺寸最好保持640x120，大小在50K以内,仅限jpg,jpeg,png格式的图片
+                        横幅图片素材尺寸最好保持640x120，大小在500K以内,仅限jpg,jpeg,png格式的图片
                       </sub>
                     </span>
                     <input type="file" name="productBanner" id="productBanner"/>
@@ -85,6 +88,25 @@
                   </div>
                 </div>
               </div>
+              <div class="form-group" id="details-image-group">
+               <label class="col-sm-2 control-label">详情大图：</label>
+               <div class="col-sm-7">
+                  <div class="padding-medium">
+                    <span>选择本地图片                      
+                      <sub class="text-danger">
+                        商品详情大图宽度必须大于620px,高度不限,仅限jpg,jpeg,png格式的图片
+                      </sub>
+                    </span>
+                    <input type="file" name="productDetailsImage" id="productDetailsImage"/>
+                  </div>
+                  <ul class="thumb-preview-list clearfix">
+                    <%for(var i=0;i<10;i++){%>
+                      <li data-index="<%=i%>"> </li>                     
+                    <%}%>
+                  </ul>
+                </div>
+              </div>
+
               <h5 class="section-title">2.商品物流费用</h5>
               <div class="form-group">
                <label class="col-sm-2 control-label">商品运费：</label>
@@ -100,12 +122,12 @@
                   <ul class="form-verticle-list">
                     <li>
                     <label class="radio-inline">
-                      <input type="radio" value="1" name="startType" checked> 放入仓库
+                      <input type="radio" value="1" name="status" checked> 放入仓库
                     </label>
                     </li>
                     <li>
                     <label class="radio-inline">
-                      <input type="radio" value="2" name="startType">设定时间
+                      <input type="radio" value="2" name="status">设定时间
                     </label>
                     <label class="select-inline">
                       <select name="startDate">
@@ -120,7 +142,7 @@
                     <li>
                     <li>
                     <label class="radio-inline">
-                      <input type="radio" value="3" name="startType"> 立即开始
+                      <input type="radio" value="3" name="status"> 立即开始
                     </label>
                     </li>
                     <li>
@@ -131,21 +153,23 @@
               </div>
               <div class="form-group">
                 <label class="col-sm-2 control-label">开抢时间：</label>
-                <div class="col-sm-1">
-                <select class="form-control" id="startHour" name="startHour">
-                  <%for(var i=8;i<=24;i++){%>
-                  <option value="<%=i%>"><%=i%></option>
-                  <%}%>
-                </select>
-                <span class="text-unit">时</span>
-                </div>
-                <div class="col-sm-1">
-                <select class="form-control" id="startMinute" name="startMinute">
-                  <option value="0">00</option>
-                  <option value="0">15</option>
-                  <option value="30">30</option>                  
-                </select>
-                <span class="text-unit">分</span>
+                <div class="col-sm-6">
+                  <div class="control-select">
+                    <select id="startHour" name="startHour">
+                      <%for(var i=0;i<=24;i++){%>
+                      <option value="<%=i%>" <%if(i==8){%>selected<%}%>>
+                        <%=i%>
+                      </option>
+                      <%}%>
+                    </select>
+                    <span>时</span>
+                    <select id="startMinute" name="startMinute">
+                      <option value="0">00</option>
+                      <option value="0">15</option>
+                      <option value="30">30</option>                  
+                    </select>
+                    <span>分</span>
+                  </div>
                 </div>
               </div>
               <div class="form-submit">
@@ -171,6 +195,10 @@
         $('#productImage').on('change',function(){
           if($(this).val())
             main.uploadImage();
+        })
+        $('#productDetailsImage').on('change',function(){
+          if($(this).val())
+            main.uploadDetails();
         })
         $('#productBanner').on('change',function(){
             if($(this).val()){

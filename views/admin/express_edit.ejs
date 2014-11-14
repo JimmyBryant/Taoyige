@@ -5,7 +5,7 @@
     <title>淘一个——修改快递单号</title>
   </head>
   <body>
-    <%var nav_index=2;%>
+    <%var nav_index=1;%>
     <% include ../template/admin_header %>
     <div class="main-content-wrapper">
       <div class="container">
@@ -19,6 +19,16 @@
               t='0'+t;
             }
             return t;
+          }
+          var getLocalFormat = function(date){
+              var y=date.getFullYear()
+                  ,m=date.getMonth()+1
+                  ,d=date.getDate()
+                  ,h=date.getHours()
+                  ,mi=date.getMinutes()
+                  ,s=date.getSeconds()
+                ;
+              return y+'-'+parseTime(m)+'-'+parseTime(d)+' '+parseTime(h)+':'+parseTime(mi)+':'+parseTime(s)
           }
           var D = new Date(order.timestamp),y=D.getFullYear(),m=D.getMonth()+1,d=D.getDate(),h=D.getHours(),mi=D.getMinutes(),s=D.getSeconds();
         %>
@@ -36,7 +46,7 @@
               <tbody>
                   <tr class="order-hd">
                     <td colspan="5">
-                      <span class="dealtime"><%=y+'-'+parseTime(m)+'-'+parseTime(d)%> <%=parseTime(h)+':'+parseTime(m)+':'+parseTime(s)%></span>订单编号：<span class="text-primary"><%=order.id%></span>
+                      <span class="dealtime"><%=getLocalFormat(D)%></span>订单编号：<span class="text-primary"><%=order.id%></span>
                     </td>
                   </tr>
                   <tr class="order-bd">
@@ -78,6 +88,8 @@
             </table>
             <form class="form-deliver-order form-horizontal" action="/admin/orders/edit_express" method="post">
             <input type="hidden" name="id" value="<%=order.id%>"/>
+            <input type="hidden" name="customExpressContext" id="customExpressContext"/> 
+            <input type="hidden" name="customExpressTime" id="customExpressTime"/> 
             <div class="form-group">
               <label class="col-sm-2 control-label" for="expressCompany">
                 快递公司：
@@ -100,9 +112,42 @@
               <input type="text" id="expressNumber" name="expressNumber" class="form-control" placeholder="快递单号" value="<%=order.expressNumber||''%>">
               </div>
             </div>
-
+            <hr>
+            <div class="form-group">
+              <dl class="custom-info-list">
+                <%if(order.customExpressInfo){
+                  order.customExpressInfo.forEach(function(obj,i){%>
+                  <dd data-index="<%=i%>"> 
+                    <label> 
+                     <span class="text"><%=obj.context%></span>
+                     <em class="time"><%=obj.time%></em>
+                    </label> 
+                    <div class="edit-box">
+                        <input type="text" class="val1" value="<%=obj.context%>"/>
+                        <input type="text" class="val2" value="<%=obj.time%>"/>
+                        <a href="javascript:;" class="btn-ok glyphicon glyphicon-ok"></a>
+                        <a href="javascript:;" class="btn-cancel glyphicon glyphicon-remove"></a>
+                    </div> 
+                    <div class="operate-tool">
+                      <a href="javascript:;" title="编辑" class="glyphicon glyphicon-pencil btn-edit"></a>
+                      <a href="javascript:;" title="删除" class="glyphicon glyphicon-remove btn-delete"></a> 
+                    </div> 
+                  </dd>
+                <%});}%>
+              </dl>
+              <label class="col-sm-2 control-label">自定义快递信息：</label>
+              <div class="col-sm-4">
+                <input type="text" id="express-context" name="express-context" class="form-control" placeholder="快递内容"/>
+              </div>
+              <div class="col-sm-2">
+                <input type="text" id="express-time" name="express-time" class="form-control" value="<%=getLocalFormat(new Date())%>" placeholder="时间"/>
+              </div>
+              <div class="col-sm-2">
+               <button type="button" class="btn btn-info add-custom-info">添加</button>
+              </div>
+            </div>
             <div class="form-submit">
-              <button  class="btn btn-primary" type="submit">
+              <button  class="btn btn-primary" id="btn-express-submit" type="submit">
                 保存快递信息
               </button>
             </div>
@@ -112,6 +157,12 @@
         </div>
       </div>      
     </div>
-
+    <script type="text/javascript">
+      require(['jquery','admin.main'],function($,main){
+        <%if(order&&order.customExpressInfo){%>
+          main.customExpressInfo = <%-JSON.stringify(order.customExpressInfo)%>
+        <%}%>
+      })
+    </script>
   </body>
 </html>

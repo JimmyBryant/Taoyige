@@ -59,7 +59,7 @@ var admin = {
 						req.session.referrer = '';
 						res.redirect(ref);
 					}else{
-						res.redirect('/admin/index')
+						res.redirect(global.appConfig.host+'/admin/index')
 					}					
 				}else{
 					res.render('admin/login')
@@ -83,10 +83,15 @@ var admin = {
 var order = {	
 	// 订单管理首页 
 	index: function(req,res){
+		res.redirect('/admin/orders/paid')
+	},
+	// 待发货订单
+	paid: function(req,res){
 		if(method=='get'){
 			getOrderlist('paid',req,res);
 		}
 	},
+	// 已发货订单
 	delivered: function(req,res){
 		if(method=='get'){
 			getOrderlist('delivered',req,res);
@@ -105,9 +110,29 @@ var order = {
 		}
 	},
 	//退款完成的订单
-	refund_success: function(req,res){
+	refundSuccess: function(req,res){
 		if(method=='get'){
 			getOrderlist('refundSuccess',req,res);
+		}
+	},
+	// 查询订单
+	search: function(req,res){
+		var orderlist = [];
+		if(method=='get'){
+			res.render('admin/orders_search',{user:user,orderlist:orderlist})
+		}else if(method=='post'){
+			var id = req.body.id.trim()
+				;
+			if(id){
+				orderManager.getOrderDetails(id,function(err,replies){
+					if(!err){
+						orderlist.push(replies)
+					}
+					res.render('admin/orders_search',{id:id,user:user,orderlist:orderlist,orderStatus:orderStatus})
+				})				
+			}else{
+				res.render('admin/orders_search',{user:user,orderlist:orderlist})
+			}
 		}
 	},
 	// 填写快递信息
@@ -118,7 +143,7 @@ var order = {
 			if(id){
 				orderManager.getOrderDetails(id,function(err,replies){
 					var order = replies;
-					res.render('admin/express_add',{order:order,mapper:mapper});
+					res.render('admin/express_add',{order:order,mapper:mapper,user:user});
 				})
 			}else{
 				res.render('admin/express_add',{order:order,mapper:mapper,user:user});
@@ -127,17 +152,38 @@ var order = {
 			var id = req.body.id
 				,expressCompany = req.body.expressCompany
 				,expressNumber = req.body.expressNumber.trim()
+				,customExpressContext = req.body.customExpressContext
+				,customExpressTime = req.body.customExpressTime
+				,customExpressInfo = []
 				;
-			if(id&&expressCompany&&expressNumber){
-				orderManager.deliverOrder(id,expressCompany,expressNumber,function(err,replies){
-					if(replies){
-						res.send('发货成功')
-					}else{
-						res.send('发货失败')
-					}					
-				})
+			if(id){
+				// 如果有自定义快递信息则进行处理
+				if(customExpressContext&&customExpressTime){
+					var contextArr = customExpressContext.split('|')
+						,timeArr = customExpressTime.split('|')
+						;
+					contextArr.forEach(function(val,i){
+						customExpressInfo.push({context:val,time:timeArr[i]})
+					})
+				}
+				if((expressCompany&&expressNumber)||customExpressInfo.length){
+					orderManager.deliverOrder(id,{
+						expressCompany:expressCompany,
+						expressNumber:expressNumber,
+						customExpressInfo:customExpressInfo
+					},function(err,replies){
+						console.log(err,replies)
+						if(replies){
+							res.send('发货成功')
+						}else{
+							res.send('发货失败')
+						}					
+					})
+				}else{
+					res.redirect('/admin/orders/add_express?id='+id);
+				}
 			}else{
-				res.redirect('/admin/add_express?id='+id);
+				res.redirect('/admin/orders/add_express?id='+id);
 			}
 		}
 		
@@ -149,7 +195,7 @@ var order = {
 			var id = req.query.id||'';			
 			if(id){
 				orderManager.getOrderDetails(id,function(err,replies){
-					var order = replies;
+					var order = replies;					
 					res.render('admin/express_edit',{order:order,mapper:mapper,user:user});
 				})
 			}else{
@@ -159,11 +205,26 @@ var order = {
 			var id = req.body.id
 				,expressCompany = req.body.expressCompany
 				,expressNumber = req.body.expressNumber.trim()
-				;
-			if(id&&expressCompany&&expressNumber){
-				orderManager.setExpressInfo(id,expressCompany,expressNumber,function(err,replies){
-					res.redirect('/admin/orders/edit_express?id='+id);					
-				})
+				,customExpressContext = req.body.customExpressContext
+				,customExpressTime = req.body.customExpressTime
+				,customExpressInfo = []
+				;			
+			if(id){				
+				if(customExpressContext&&customExpressTime){
+					var contextArr = customExpressContext.split('|')
+						,timeArr = customExpressTime.split('|')
+						;
+					contextArr.forEach(function(val,i){
+						customExpressInfo.push({context:val,time:timeArr[i]})
+					})
+				}					
+				if((expressCompany&&expressNumber)||customExpressInfo.length){
+					orderManager.setExpressInfo(id,{expressCompany:expressCompany,expressNumber:expressNumber,customExpressInfo:customExpressInfo},function(err,replies){
+						res.redirect('/admin/orders/edit_express?id='+id);					
+					})
+				}else{
+					res.redirect('/admin/orders/edit_express?id='+id);
+				}
 			}else{
 				res.redirect('/admin/orders/edit_express?id='+id);
 			}
@@ -265,7 +326,7 @@ function getOrderlist(type,req,res){
 			var orderlist = [];
 			if(replies){
 				orderlist=replies;
-			}
+			}			
 			res.render('admin/orders_'+type,{orderlist:orderlist,orderStatus:orderStatus,pager:pager,user:user})
 		});
 	})
@@ -326,7 +387,7 @@ var product = {
 		}
 	},
 	// 发布商品
-	add: function (req,res) {
+	add: function (req,res){
 		if(method=='get'){
 			getIdleArr(function(replies){
 				var idleArr = replies;
@@ -336,6 +397,7 @@ var product = {
 			postProduct(req,res)
 		}
 	},
+	// 编辑商品
 	edit: function(req,res){
 		if(method=='get'){
 			var id = req.query.id;
@@ -348,9 +410,12 @@ var product = {
 					// 获取还未排期的日子
 					getIdleArr(function(replies){
 						var idleArr = replies;
-						if(product&&product.saleStartTime){
+						// 添加当前销售日期到排期队列
+						if(product&&product.status==productManager.productStatus.ready){
 							var d = new Date(product.saleStartTime).getDate()-new Date().getDate();
-							!_.contains(idleArr,d)&&idleArr.push(d);
+							if(d>0){
+								!_.contains(idleArr,d)&&idleArr.push(d);
+							}							
 						}
 						res.render('admin/product_edit',{user:user,product:product,idleArr:idleArr});
 					})					
@@ -418,8 +483,37 @@ var product = {
 					// 复制图片到banner目录
 					var imgData = fs.readFileSync(image.path);
 					fs.writeFileSync(banner_path,imgData)
-					res.send({data:url});
+					res.send({
+						data:url
+					});
 				}
+			}else{
+				res.send({err:imageError.typeError})
+			}
+		}		
+	},
+	// 上传商品详情大图
+	uploadDetails: function(req,res){
+		if(method=='post'){
+			var image = req.files.productDetailsImage;
+			var dir_name = "details";
+			if(image.extension=='jpg'||image.extension=='png'||image.extension=='jpeg'){
+				var directory = node_path.join(node_path.dirname(image.path),'..',dir_name)
+					,_path = node_path.join(directory,image.name)
+					,url = node_path.join('/products/'+dir_name,image.name)
+					;
+				if(!fs.existsSync(directory)){
+					fs.mkdirSync(directory)
+				}
+				// 复制图片到banner目录
+				var imgData = fs.readFileSync(image.path);
+				fs.writeFileSync(_path,imgData)
+				res.send({
+					data:{
+						path:url
+					}
+				});
+				
 			}else{
 				res.send({err:imageError.typeError})
 			}
@@ -476,12 +570,13 @@ function postProduct(req,res){
 		,price = params.price.trim()
 		,oriPrice = params.oriPrice.trim()
 		,count = params.count.trim()
-		,startType = params.startType
+		,status = params.status //商品状态
 		,startDate = ''
 		,startTime=''
 		,endTime=''	
 		,normalImageUrl = params.normalImageUrl
 		,bannerImageUrl = params.bannerImageUrl
+		,detailsImageUrl = params.detailsImageUrl
 		;
 	//简单判断表单是否存在空值	
 	if(!title||!price||!oriPrice||!count||!normalImageUrl){
@@ -493,6 +588,8 @@ function postProduct(req,res){
 	}else{
 		// 获取商品图片url数组
 		normalImageUrl = normalImageUrl.split(',');
+		//获取商品详情大图数组
+		detailsImageUrl = detailsImageUrl.split(',');
 		// 获取商品大图和小图url数组
 		var largeImageUrl = [];
 		var thumbImageUrl = [];
@@ -511,10 +608,11 @@ function postProduct(req,res){
 			normalImageUrl:normalImageUrl,
 			largeImageUrl:largeImageUrl,
 			thumbImageUrl:thumbImageUrl,
+			detailsImageUrl:detailsImageUrl,
 			bannerUrl:bannerImageUrl,
-			startType: startType
+			status: status
 		};
-		if(startType==2){	// 设置开始时间
+		if(status==2){	// 设置开始时间
 			var d = parseInt(params.startDate)
 				;
 			if(d>0&d<16){						
@@ -523,7 +621,7 @@ function postProduct(req,res){
 				res.send('只能预定15天')
 				return;
 			}
-		}else if(startType==3){ // 立即开始
+		}else if(status==3){ // 立即开始
 			startDate = new Date(new Date().toDateString()).valueOf()
 		}
 		var h = parseInt(params.startHour)
@@ -531,7 +629,7 @@ function postProduct(req,res){
 			;		
 		startTime = startDate+(h*60+m)*60*1000;
 		endTime = startDate+24*3600*1000;
-		if(startType!=1){
+		if(status!=1){
 			product.saleStartTime=startTime;
 			product.saleOffTime=endTime;
 		}
@@ -571,11 +669,14 @@ function getIdleArr(callback){
 	productManager.getReadyKeys(function(err,replies){
 		var dateArr = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
 			,idleArr = dateArr
+			,D =new Date()
+			,time = new Date(D.toDateString()).getTime()
 			;
+		// 过滤掉已经有排期的日期
 		if(replies&&replies.length){
 			idleArr = dateArr.filter(function(val){
 				for(var i=0,len=replies.length;i<len;i++){
-					if(val==replies[i])
+					if(parseInt(replies[i])-val*24*3600*1000==time)
 						return;
 				}
 				return val;

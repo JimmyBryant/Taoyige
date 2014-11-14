@@ -31,7 +31,7 @@
         	<img alt="<%=product.title%>" src="<%=product.largeImageUrl[0]%>"/>
         </a>
         <p class="p-title">
-          <%=product.title%>
+          <%-product.title%>
         </p>
   			<ul class="sale-desc clearfix">
   				<li class="p-sales"><span class="p-icon"></span><label>已售：<span><%=product.salesVolume%>件</span></label></li>
@@ -43,23 +43,29 @@
   				</div>
   				<div class="right">
   					<label >
-  						<span class="p-price">市场价：<em><%=product.oriPrice%></em></span>
-  						<span class="p-discount">开业营销补贴：<em><%=parseFloat(product.oriPrice)-parseFloat(product.price)%></em></span>
+  						<span class="p-price">
+                市场价：<del><%=product.oriPrice%></del>
+              </span>
+  						<span class="p-discount"><em><%=(Math.round(product.price/product.oriPrice*100)/10)%>折</em></span>
   					</label>
   					<a href="javascript:;" class="btn-shopping-now <%if(product.count<1||product.saleStartTime>Date.now()){%>disable<%}%>">立即闪购</a>
   				</div>
   			</div>
+        <%}else{%>
+          <a class="p-image-box">
+            <span class="tyg-waiting">敬请期待...</span>
+          </a>
         <%}%>
   		</div>
   		<!-- 即将开始 -->
   		<table id="table-sale-soon">
       <%readylist.forEach(function(val){ 
         var p = JSON.parse(val);
-        if(new Date(p.saleStartTime).getDate()-new Date().getDate()==1){%>
+        if(new Date(p.saleStartTime).getDate()==new Date(Date.now()+1000*3600*24).getDate()){%>
   			<tr>
   				<td>
   					<a href="javascript:;" class="title">
-  						明日开淘<b class="arrow-right"><b>
+  						即将开始<b class="arrow-right"><b>
   					</a>
   				</td>
   				<td>
@@ -79,7 +85,9 @@
         })
       </script>
   	</div>
-    <script src="http://meiqia.com/js/unit/button.js?id=3641" charset="UTF-8">
-    </script>
+    <!-- 客户代码 -->
+    <script src="https://s.meiqia.com/js/unit/button.js?id=3642" charset="UTF-8"></script>
+    <!-- CNZZ统计 -->
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1253476325'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1253476325%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>     
   </body>
 </html>

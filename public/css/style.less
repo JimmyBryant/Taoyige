@@ -93,7 +93,7 @@ input[type=text], select {
 }
 body{
 	min-width: @min_width;
-	font:100%/1.125em 'microsoft yahei',Verdana,Arial,Helvetica,sans-serif;
+	font:100%/1.125em tahoma,arial,'Hiragino Sans GB','\5b8b\4f53',sans-serif;
 	color:#000;
 }
 a{
@@ -216,14 +216,31 @@ header{
 
 .login-box{	
 	padding:@medium;
+	text-align:center;
 	h1{
 		text-align:center;
 		font-size:@font_large;
+		margin-bottom:@large;
+	}
+	.icon{
+		background:#FF9E07 url(../images/bg/login_icons.png) no-repeat;
+		background-size:42px;
+		display: inline-block;
+		width: 42px;
+		height: 42px;
+		font-size: 0;
+		margin-right: @normal;
+		max-height: 42px;
+		.border-radius(8px,8px,8px,8px);
+	}
+	.icon-qq{
+		background-position:0 -2px;
+	}
+	.icon-weibo{
+		background-position: -1px -82px;
 	}
 	.icon-alipay{
-		width:@icon_medium;
-		height:@icon_medium;		
-		background-size:@icon_medium;
+		background-position:0 -42px;
 	}
 }
 .bg-white{
@@ -236,15 +253,24 @@ header{
 	.p-image-box{
 		display:block;
 		position:relative;
+		min-height: 320px;
+		.tyg-waiting{
+			display:inline-block;
+			width:100%;
+			text-align:center;
+			padding:20px 0;
+		}
 		img{
 			width:100%;
+			min-height: 320px;
+    		min-width: 320px;
 		}
 	}
 	.p-title{
 		font-size: @font_large;
 		line-height:24px;
 		color: #000;
-		padding: @normal @small;
+		padding: @normal;
 	}
 	.sale-desc{
 		color:#FFF;
@@ -291,9 +317,11 @@ header{
 			display:block;
 		}
 	}
+
 	.left{
 		float:left;
 		.p-nowprice{
+			padding:0 @normal;
 			font-size: 46px;
 			line-height: 60px;
 			font-family: arial;
@@ -303,14 +331,23 @@ header{
 	.right{
 		float:right;
 		label{
+			color:#666;
 			margin-right:@normal;
 			line-height:30px;
 		}
+		em{
+			font-style:normal;
+		}
 		.p-price{
-			color:#666;
 			em{
-				text-decoration:line-through;
-			}			
+				color:#333;
+			}		
+		}
+		.p-discount>em{
+			padding: 3px 5px;
+			background: rgb(104, 104, 104);
+			color: #FFF;
+			font-style: normal;
 		}
 		.btn-shopping-now{
 			position: relative;
@@ -338,6 +375,7 @@ header{
 	}
 
 }
+
 .shopping-action{
 	border-top:1px solid @base_col2;
 	background:#FFF;
@@ -420,14 +458,17 @@ header{
 		}
 	}
 	td:last-child{
+		border:none;
+		background-color:rgba(0,0,0,.4);
 		.cont{
-			background:#000;
+			background:rgba(0,0,0,.4);
 			display: block;
 			line-height: 0;
 		}
 		img{
 			opacity:0.4;
 			max-width:100%;
+			min-height: 60px;
 		}
 	}
 	
@@ -464,6 +505,14 @@ footer{
 		padding:@normal 0;
 		text-align:center;
 		border-top:1px solid #CCC;
+		a{
+			margin:0 @normal;
+			color:@base_col1;
+		}
+		.cert-logos img{
+			height:24px;
+			vertical-align: middle;
+		}
 	}
 }
 .main footer .footnav{
@@ -569,12 +618,13 @@ footer{
 	#table-sale-soon{ 
 		font-size:@font_normal;
 		td:last-child img {
-			max-height: 60px;
+			min-height: 60px;
+			max-height: 80px;
 		}
 	}
 	#sale-today{
 		.p-title{
-			font-size:@font_medium;
+			font-size:@font_normal;
 			line-height:20px;
 		}
 	}

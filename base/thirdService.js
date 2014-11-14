@@ -15,6 +15,122 @@ var https_verify_url = 'https://mapi.alipay.com/gateway.do?service=notify_verify
 var http_verify_url = 'http://notify.alipay.com/trade/notify_query.do?';
 var aliConfig = serviceConfig.alipay;
 module.exports = {
+	// 新浪微博登录授权api url
+	weibo_getLoginUrl: function(){
+		var config = serviceConfig.weibo.quickLogin;
+		var url = 'https://api.weibo.com/oauth2/authorize?client_id='
+				+ config.id
+				+'&response_type=code&redirect_uri='
+				+ config.returnUrl;
+		return url;
+	},
+	// HTTPS POST 获取新浪微博access token
+	weibo_getAccessToken: function(code,callback){
+		var config = serviceConfig.weibo.quickLogin;
+		var post_data = {
+			client_id:config.id,
+			client_secret:config.secret,
+			grant_type:'authorization_code',
+			redirect_uri:config.returnUrl,
+			code:code
+		}
+		post_data = querystring.stringify(post_data);
+		var options = {
+			hostname:'api.weibo.com',
+			path:'/oauth2/access_token',
+			method:'POST',
+			headers:{
+				'Content-Type': 'application/x-www-form-urlencoded',
+				'Content-Length': post_data.length
+			}
+		}
+		var req = https.request(options,function(res){
+			res.setEncoding('utf8');
+			res.on('data', function (chunk) {			
+				var chunk = decodeURIComponent(chunk);
+				callback(chunk);
+				return;
+			})
+		});
+		req.write(post_data);
+		req.end();
+		req.on('error',function(e){
+			 console.error(e);
+		})	
+
+	},
+	// 通过access token获取用户信息
+	weibo_getUserInfo: function(token,uid,callback){
+		var config = serviceConfig.weibo.quickLogin;
+		var api = "https://api.weibo.com/2/users/show.json?access_token="
+			+token
+			+'&uid='
+			+uid
+			;
+		https.get(api,function(res){
+			res.on('data',function(chunk){
+				var chunk = decodeURIComponent(chunk);
+				callback(chunk)
+				return;
+			});
+		}).on('error',function(e){
+			console.error(e)
+		})
+
+	},
+	// QQ登录授权api url
+	qq_getLoginUrl: function(){
+		var config = serviceConfig.qq.quickLogin;
+		var api = 'https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id='
+				+ config.id
+				+ '&redirect_uri='
+				+ encodeURIComponent(config.returnUrl)
+				+ '&state='
+				+ Date.now()
+				;
+		return api;
+	},
+	// 获取access token
+	qq_getAccessTokenUrl: function(code,callback){
+		var config = serviceConfig.qq.quickLogin;
+		var api = 'https://graph.qq.com/oauth2.0/token?grant_type=authorization_code&client_id='
+				+ config.id
+				+ '&client_secret='
+				+ config.secret
+				+ '&code='
+				+ code
+				+ '&redirect_uri='
+				+ encodeURIComponent(config.returnUrl)
+				;
+		https_get(api,callback);
+	},
+	// QQ获取用户的openid后才能调用其他api
+	qq_getOpenID: function(token,callback){
+		var api = 'https://graph.qq.com/oauth2.0/me?access_token='+token;
+		https_get(api,callback);
+	},
+	// QQ 获取用户信息
+	qq_getUserInfo: function(token,openid,callback){
+		var config = serviceConfig.qq.quickLogin;
+		var api = 'https://graph.qq.com/user/get_user_info?access_token='
+				+token
+				+'&oauth_consumer_key='
+				+config.id
+				+'&openid='
+				+openid
+				;
+		https.get(api,function(res){
+			res.setEncoding('utf8');
+			res.on('data', function (chunk) {			
+				var chunk = decodeURIComponent(chunk);
+				callback(chunk);
+				return;
+			})
+		}).on('error',function(e){
+			console.error(e)
+		})				
+	},
+	// 支付宝登录授权api url
 	alipay_getLoginUrl : function(){
 		var params =   {
 			"_input_charset" : "utf-8",
@@ -287,3 +403,15 @@ function getResponse(notify_id,callback) {
 
 }
 
+function https_get(api,callback){
+	https.get(api,function(res){
+		res.setEncoding('utf8');
+		res.on('data', function (chunk) {			
+			var chunk = decodeURIComponent(chunk);
+			callback(chunk);
+			return;
+		})
+	}).on('error',function(e){
+		console.error(e)
+	})
+}

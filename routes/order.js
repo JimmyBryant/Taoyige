@@ -6,6 +6,7 @@ var userManager = require('../base/userManager')
 	,addressManager = require('../base/addressManager')
 	,addressMap = require('../base/addressMap')
 	,xto = require("xto")
+	,_ = require('underscore')
 	;
 
 var method = ''
@@ -47,12 +48,12 @@ var actions = {
 		}else if(method=='post'){
 			var addressID = req.body.addressID
 				;
-			// 订单信息还是查询购物车
+			// 查询购物车获取订单信息
 			cartManager.getCart(uid,function(err,replies){
-				if(err){
-					res.send('无法创建订单')
+				if(err||!replies){
+					res.send('创建订单失败')
 				}else{
-					var cart = JSON.parse(replies);
+					var cart = JSON.parse(replies);					
 					var freight = 0
 						,totalPrice = cart.price*cart.count
 						,oriPrice = cart.oriPrice*cart.count
@@ -148,6 +149,22 @@ var actions = {
 			})
 		}
 	},
+	// 用于异步获取已经关闭或者交易完成的订单
+	asyncComplete: function(req,res) {
+		var uid = user.id
+			,start = parseInt(req.query.start)||0
+			,count = 10
+			;		
+		if(method=='get'){
+			orderManager.getCompleteOrder(uid,start,count,function(err,replies){
+				var orderlist = [];
+				if(replies){
+					orderlist = replies;
+				}
+				res.send(orderlist);
+			})
+		}
+	},
 	// 订单详情
 	details: function(req,res){
 		var user = req.session.userInfo
@@ -183,11 +200,25 @@ var actions = {
 						order = replies;
 						var track_id = order.expressNumber
 						,company_name = order.expressCompany
-						;		
-						xto.query(track_id, company_name, function(status, msg, json) {	
-							var company_info = xto.getCompanyInfo(company_name); 		
-						    res.render('order/order_track',{order:order,express:json,company:company_info})
-						});
+						,custom_express_info = order.customExpressInfo
+						;	
+						if(track_id&&company_name){
+							xto.query(track_id, company_name, function(status, msg, json) {	
+								var company_info = xto.getCompanyInfo(company_name); 
+								json.nu = track_id;
+								//如果有自定义快递信息，则合并
+								if(custom_express_info){
+									json.data = json.data||[];
+									json.data = _.union(json.data,custom_express_info)
+								}		
+							    res.render('order/order_track',{order:order,express:json,company:company_info})
+							});
+						}else{
+							res.render('order/order_track',{order:order,express:{
+									data:custom_express_info
+								}
+							})
+						}	
 					}else{
 						res.render('order/order_track',{order:order})
 					}
@@ -198,18 +229,33 @@ var actions = {
 		}
 
 	},
+	// 确认收货，验收订单
+	checkOrder: function(req,res){
+		var id = req.query.id
+			,uid = user.id
+			;
+		if(method == 'get'){
+			if(id){
+				orderManager.checkOrder(id,uid,function(err,replies){
+					if(err){
+						res.send(false)
+					}else{
+						res.send(true)
+					}
+				})	
+			}else{
+				res.send(false)
+			}
+		}
+	},
 	//用于关闭过期未支付的订单
 	close: function(req,res){
-		var user = req.session.userInfo
-			,uid = user.id
+		var uid = user.id
 			,id = req.query.id
-			,pid = req.query.pid //商品ID
-			,count = 1
-			,m = req.method
 			;
-		if(m=='GET'){
+		if(method=='get'){
 			if(id){
-				orderManager.closeOrder(id,pid,function(err,replies){
+				orderManager.closeOrder(id,uid,function(err,replies){
 					res.redirect('/order/details?id='+id)
 				})	
 			}else{

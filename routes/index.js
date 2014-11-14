@@ -14,7 +14,7 @@ var productManager = require('../base/productManager');
 router.use(login.autoLogin);
 
 // 首页
-router.get('/', function(req,res){
+router.get('/welcome', function(req,res){
 	var session = req.session
 		,user = session.userInfo
 		;
@@ -29,6 +29,21 @@ router.get('/', function(req,res){
 		})		
 	})		
 });
+
+// 关于淘一个
+router.get('/',function(req,res){
+	var session = req.session
+		,user = session.userInfo
+		;
+	res.render('intro/about',{user:user})
+})
+// 关于我们
+router.get('/about',function(req,res){
+	var session = req.session
+		,user = session.userInfo
+		;
+	res.render('intro/about',{user:user})
+})
 
 // 登录
 router.get('/login',login.login);

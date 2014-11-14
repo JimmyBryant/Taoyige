@@ -18,7 +18,7 @@ var controller = {
 			,user = req.session.userInfo
 			;
 		if(m=='GET'){
-			res.render('user/home',{user:user});
+			res.render('user/home',{user:user,loginPlatform:userManager.loginPlatform});
 		}
 	},
 	// 收货地址列表页面

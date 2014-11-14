@@ -5,6 +5,7 @@ require.config({
 		'jquery':'jquery/jquery-2.1.1.min',
 		'jmobile':'jquery.mobile/jquery.mobile-1.4.3.min',
 		'glide':'glide.min',
+		'swiper':'swiper.min',
 		'addressData':'addressData',
 		'addrSelctor':'addrSelector',
 		'modal':'bootstrap/js/bootstrap.modal.min',
@@ -16,14 +17,17 @@ require.config({
 		'jform':'jquery.form.min'
 	},
 	shim:{
+		'swiper':{
+			deps: ['jquery']
+		},
 		'glide': {
-            deps: ['jquery']
-        },
-        'modal':{
-        	deps: ['jquery']
-        },
-    	   'jform':{
-        	deps: ['jquery']
-        }
+			deps: ['jquery']
+		},
+		'modal':{
+			deps: ['jquery']
+		},
+		'jform':{
+			deps: ['jquery']
+		}
 	}
 })

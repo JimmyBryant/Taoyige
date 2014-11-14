@@ -45,6 +45,7 @@ var order = {
 	timer:20*60*1000,	//定时付款，否则订单关闭，默认20分钟
 	expressCompany:'',	//快递公司ID
 	expressNumber:'',	//快递单号
+	customExpressInfo:[],	//自定义快递信息,[{context:'',time:''}]
 	freight:0,	// 快递费用
 	paymentplatform:'',	//支付平台 "1" 微信;"2" 支付宝
 	paymentNotice:'',	//支付消息记录
@@ -58,6 +59,7 @@ var orderKey = redisKey.order
 	,addrssKey = redisKey.address
 	,orderCountKey = redisKey.orderCount
 	,productKey = redisKey.product
+	,userKey = redisKey.user
 	;
 var parseTime = function(t,num){
 	var num = num||2
@@ -89,8 +91,8 @@ module.exports = {
 						callback('该商品不存在')
 					}else{
 						var product = JSON.parse(replies);
-						if(product.count<(product.salesVolume+count)){	//商品数量不够
-							callback(err)
+						if(product.count<count){	//商品数量不够
+							callback('商品数量不够')
 						}else{	// 创建订单
 							var id = arr.join('');
 							_.map(obj,function(val,key){
@@ -107,40 +109,48 @@ module.exports = {
 							var so = JSON.stringify(small_order);
 							var multi = redisCli.multi();
 							multi.hset(orderKey,id,JSON.stringify(order))
-							.rpush(redisKey.getStatusOrderKey(order.status),order.id)
-							.rpush(redisKey.getUserOrderKey(order.userID),so)
-							.rpush(redisKey.getDateOrderKey(now),so)
+							.lpush(redisKey.getStatusOrderKey(order.status),order.id)
+							.lpush(redisKey.getUserOrderKey(order.userID),so)
+							.lpush(redisKey.getDateOrderKey(now),so)
 							.exec(function(err,replies){
 								if(err){
 									callback(err)
 								}else{
+									//传递order id
+									callback(null,id);
 									//减少库存
 									productManager.reduceStock(order.productID,count,function(err,replies){
 										if(err){
 											console.log('reduceStock error ',err)
-										}
-										//传递order id
-										callback(null,id);
-									})									
-									//创建cronjob，定时执行
-									var job = new CronJob({
-										cronTime: new Date(order.timestamp+order.timer),
-										onTick:function(){
-											//关闭订单并且减少商品的销售数量
-											changeOrder(id,{status:orderStatus.closed},function(err,replies){
-												if(err){
-													console.log(err)
-												}else{
-													productManager.increaseStock(productID,count,function(err,replies){
+										}else{											
+											//创建cronjob，定时执行
+											var job = new CronJob({
+												cronTime: new Date(order.timestamp+order.timer),
+												onTick:function(){
+													//关闭订单并且恢复商品库存
+													getOrder(id,function(err,replies){
 														if(!err){
-															console.log('商品销售数量已恢复')
+															var order = JSON.parse(replies);
+															// 如果订单未支付
+															if(order.status == orderStatus.unpaid){
+																changeOrder(id,{status:orderStatus.closed},function(err,replies){
+																	if(!err){
+																		productManager.increaseStock(productID,count,function(err,replies){
+																			if(replies){
+																				console.log('订单已经关闭，库存恢复')
+																			}
+																		})
+																	}
+																})
+															}
 														}
 													})
-												}
-											})
-										},
-										start:true
-									})
+									
+												},
+												start:true
+											})											
+										}
+									})									
 								}
 							});
 						}
@@ -178,6 +188,7 @@ module.exports = {
 		}
 	},
 	// 获取订单详细信息,包括商品信息
+	// return Object
 	getOrderDetails: function(id,callback){
 		if(id){
 			getOrder(id,function(err,replies){
@@ -322,11 +333,12 @@ module.exports = {
 			callback('用户ID不能为空')
 		}
 	},
-	// 获取已经完成的订单
+	// 获取已经完成的订单,包括已收货订单已经已关闭订单
 	getCompleteOrder: function(uid,start,count,callback){
 		if(uid){
-			var end = start+count-1;
-			redisCli.lrange(redisKey.getUserOrderKey(uid),start,end,function(err,replies){
+			var end = parseInt(start)+parseInt(count);
+			// 获取用户全部订单
+			redisCli.lrange(redisKey.getUserOrderKey(uid),0,-1,function(err,replies){
 				if(err){
 					callback(err)
 				}else{
@@ -340,8 +352,10 @@ module.exports = {
 								complete.push(small_order.id);
 							}
 						});
+						// 获取数组片段
+						chunk = complete.slice(start,end);
 						// 获取订单详细信息
-						redisCli.hmget(orderKey,complete,function(err,replies){
+						redisCli.hmget(orderKey,chunk,function(err,replies){
 							if(err){
 								callback(err)
 							}else{
@@ -372,63 +386,6 @@ module.exports = {
 			callback('无法获取订单')
 		}
 	},
-	// 根据订单状态获取订单 同时也会去获取订单的商品信息
-	getOrderByStatus: function(status,start,count,callback){
-		var end = parseInt(start)+parseInt(count)-1;
-		if(status){
-			redisCli.lrange(redisKey.getStatusOrderKey(status),start,end,function(err,replies){
-				if(err){
-					callback(err)
-				}else{
-					if(replies.length){
-						redisCli.hmget(orderKey,replies,function(err,replies){
-							if(err){
-								callback(err)
-							}else{
-								//遍历返回的订单数组，查找商品数据
-								var orderlist = []
-								var productIDArr = [];
-								_.each(replies,function(val,i){
-									if(val){
-										var order = JSON.parse(val);
-										orderlist.push(order);
-										productIDArr.push(order.productID);
-									}
-								})
-
-								// 查找商品信息
-								redisCli.hmget(productKey,productIDArr,function(err,replies){
-									if(replies){
-										_.each(replies,function(val,i){
-											orderlist[i]['product'] = JSON.parse(replies[i]);
-										})
-									}
-									callback(null,orderlist)
-								})
-							}
-						})
-					}else{
-						callback(null,[])
-					}
-				}
-			})
-		}else{
-			callback('获取订单失败')
-		}
-	},
-	// 获取某种状态下的订单数量
-	lengthOfStatusOrder: function(status,callback){
-		redisCli.llen(redisKey.getStatusOrderKey(status),function(err,replies){
-			if(err){
-				callback(err)
-			}else{
-				callback(null,replies);
-			}
-		})
-	},
-	getOrder: function(id,callback){
-		getOrder(id,callback);
-	},
 	// 获取未完成的订单
 	getUncompleteOrder: function(uid,callback){
 		if(uid){
@@ -453,6 +410,72 @@ module.exports = {
 		}else{
 			callback('无法获取订单')
 		}
+	},	
+	// 根据订单状态获取订单 同时也会去获取订单的商品信息
+	getOrderByStatus: function(status,start,count,callback){
+		var end = parseInt(start)+parseInt(count)-1;
+		if(status){
+			redisCli.lrange(redisKey.getStatusOrderKey(status),start,end,function(err,replies){
+				if(err){
+					callback(err)
+				}else{
+					if(replies.length){
+						redisCli.hmget(orderKey,replies,function(err,replies){
+							if(err){
+								callback(err)
+							}else{
+								//遍历返回的订单数组，查找商品数据
+								var orderlist = [];
+								var productIDArr = [];
+								var userIDArr = [];
+								_.each(replies,function(val,i){
+									if(val){
+										var order = JSON.parse(val);
+										orderlist.push(order);
+										productIDArr.push(order.productID);
+										userIDArr.push(order.userID);
+									}
+								})
+
+								// 查找商品信息
+								redisCli.hmget(productKey,productIDArr,function(err,replies){
+									var products = replies;									
+									// 查找用户信息
+									redisCli.hmget(userKey,userIDArr,function(err,replies){
+										var users = replies;
+										if(products&&users){
+											_.each(products,function(val,i){
+												orderlist[i]['product'] = JSON.parse(products[i]);
+												orderlist[i]['user'] = JSON.parse(users[i]);												
+											})
+											callback(null,orderlist);
+										}
+									})
+								})
+
+							}
+						})
+					}else{
+						callback(null,[])
+					}
+				}
+			})
+		}else{
+			callback('获取订单失败')
+		}
+	},
+	// 获取某种状态下的订单数量
+	lengthOfStatusOrder: function(status,callback){
+		redisCli.llen(redisKey.getStatusOrderKey(status),function(err,replies){
+			if(err){
+				callback(err)
+			}else{
+				callback(null,replies);
+			}
+		})
+	},
+	getOrder: function(id,callback){
+		getOrder(id,callback);
 	},
 	// 获取用户订单列表中和某个商品相关的订单
 	getOrderByProductID: function(uid,pid,callback){
@@ -499,17 +522,25 @@ module.exports = {
 		}
 	},
 	// 订单设置为发货
-	deliverOrder: function(id,expressCompany,expressNumber,callback){
-		if(id&&expressCompany&&expressNumber){
-			changeOrder(id,{status:orderStatus.delivered,expressNumber:expressNumber,expressCompany:expressCompany},callback);
+	deliverOrder: function(id,expressObj,callback){
+		if(id&&!_.isEmpty(expressObj)){
+			var expressNumber = expressObj.expressNumber
+				,expressCompany = expressObj.expressCompany
+				,customExpressInfo = expressObj.customExpressInfo||[]
+				;
+			changeOrder(id,{status:orderStatus.delivered,expressNumber:expressNumber,expressCompany:expressCompany,customExpressInfo:customExpressInfo},callback);
 		}else{
 			callback('无法发货')
 		}
 	},
 	// 设置快递信息
-	setExpressInfo: function(id,expressCompany,expressNumber,callback){
-		if(id&&expressCompany&&expressNumber){
-			changeOrder(id,{expressNumber:expressNumber,expressCompany:expressCompany},callback);
+	setExpressInfo: function(id,expressObj,callback){
+		if(id&&!_.isEmpty(expressObj)){
+			var expressNumber = expressObj.expressNumber
+				,expressCompany = expressObj.expressCompany
+				,customExpressInfo = expressObj.customExpressInfo||[]
+				;
+			changeOrder(id,{expressNumber:expressNumber,expressCompany:expressCompany,customExpressInfo:customExpressInfo},callback);
 		}else{
 			callback('无法添加快递信息')
 		}
@@ -538,9 +569,72 @@ module.exports = {
 			callback('订单不存在')
 		}
 	},
+	// 设置订单已经收货
+	checkOrder: function(id,callback){
+		if(id){
+			// 普通用户关闭订单得判断订单是不是他的
+			if(arguments.length==3){
+				var uid = arguments[1]
+					,callback = arguments[2]
+					;
+				getOrder(id,function(err,replies){
+					if(err){
+						callback(err);
+					}else{
+						var order = JSON.parse(replies);
+						// 订单属于该用户，验收订单
+						if(order.userID==uid){
+							check(callback);
+						}else{
+							callback('订单无法关闭')
+						}
+					}
+				})
+			}else{
+				check(callback);
+			}
+		}else{
+			callback('订单收货失败')
+		}
+		function check(callback){
+			changeOrder(id,{status:orderStatus.checked},function(err,replies){
+				if(err){
+					callback(err)
+				}else{
+					callback(null,replies)
+				}			
+			});				
+		}
+	},
 	// 关闭订单
 	closeOrder: function(id,callback){		
 		if(id){
+			// 普通用户关闭订单得判断订单是不是他的
+			if(arguments.length==3){
+				var uid = arguments[1]
+					,callback = arguments[2]
+					;
+				getOrder(id,function(err,replies){
+					if(err){
+						callback(err);
+					}else{
+						var order = JSON.parse(replies);
+						// 订单属于该用户
+						if(order.userID==uid){
+							close(callback);
+						}else{
+							callback('订单无法关闭')
+						}
+					}
+				})
+			}else{
+				close(callback);
+			}
+	
+		}else{
+			callback('无法关闭订单')
+		}
+		function close(callback){
 			changeOrder(id,{status:orderStatus.closed},function(err,replies){
 				if(err){
 					callback(err)
@@ -549,14 +643,11 @@ module.exports = {
 					var count = order.count
 						,pid = order.productID
 						;
-					// 减少商品销售
-					productManager.reduceSalesVolume(pid,count,callback)
+					// 订单关闭，增加商品库存
+					productManager.increaseStock(pid,count,callback)
 				}			
-			});	
-		}else{
-			callback('无法关闭订单')
+			});				
 		}
-
 	},
 	// 自动关闭过期订单
 	closeOutdatedOrder: function(id,callback){
@@ -642,7 +733,7 @@ var getOrder = function(id,callback){
 * @param id:订单id ;changedVal:修改后的对象;callback:回调函数
 **/
 var changeOrder = function(id,changedVal,callback){
-	var allowModify = ['amount','addressInfo','freight','expressCompany','expressNumber','paymentplatform','paymentNotice','operation','status'];
+	var forbidModify = ['id','timestamp','userID','productID'];
 	if(id&&!_.isEmpty(changedVal)){
 		getOrder(id,function(err,replies){
 			if(err){
@@ -662,23 +753,26 @@ var changeOrder = function(id,changedVal,callback){
 				for(var i in changedVal){
 					var val = changedVal[i];
 					//部分订单属性无法修改
-					if(!_.contains(allowModify,i)){
+					if(_.contains(forbidModify,i)){
 						callback('无法修改订单');
 						return;
 					}else{						
 						if(i=='status'){	// 如果有更新订单状态
 							//订单已经是最新状态，返回order
 							if(val==last_status){
-								callback(null,order)
+								callback('订单已经是最新状态')
 								return;
 							}else if(order.status!=orderStatus.unpaid&&val==orderStatus.closed){	//判断订单是否未支付
-								callback('订单状态无法更改为已关闭状态');
+								callback('订单无法更改为已关闭状态');
 								return;	
 							}else if(order.status!=orderStatus.unpaid&&val==orderStatus.paid){
-								callback('订单状态无法更改为已支付状态')
+								callback('订单无法更改为已支付状态')
 								return;
 							}else if((order.status!=orderStatus.paid&&order.status!=orderStatus.returnGoodsSuccess)&&val==orderStatus.refund){
-								callback('订单状态无法更改为退款状态')
+								callback('订单无法更改为退款状态')
+								return;
+							}else if(order.status!=orderStatus.delivered&&val==orderStatus.checked){
+								callback('订单无法更改为已收货状态')
 								return;
 							}
 							
@@ -704,9 +798,9 @@ var changeOrder = function(id,changedVal,callback){
 					multi.lrem(redisKey.getUserOrderKey(uid),0,ori_small_order)
 						.lrem(redisKey.getDateOrderKey(order.timestamp),0,ori_small_order)
 						.lrem(redisKey.getStatusOrderKey(last_status),0,order.id)
-						.rpush(redisKey.getUserOrderKey(uid),small_order)
-						.rpush(redisKey.getDateOrderKey(order.timestamp),small_order)
-						.rpush(redisKey.getStatusOrderKey(order.status),order.id)
+						.lpush(redisKey.getUserOrderKey(uid),small_order)
+						.lpush(redisKey.getDateOrderKey(order.timestamp),small_order)
+						.lpush(redisKey.getStatusOrderKey(order.status),order.id)
 						;
 				}
 				multi.exec(function(err,replies){

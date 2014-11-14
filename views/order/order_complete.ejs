@@ -36,7 +36,14 @@
 						</p>
 						<p>
 							订单状态：
-							<span class="order-id text-warning"> <%=orderStatus[order.status]%> </span>
+							<span class="order-id text-warning"> 
+								<%=orderStatus[order.status]%> 
+							</span>
+							<%if(order.status==orderStatus.delivered||order.status==orderStatus.checked){%>
+								<a href="/order/track?id=<%=order.id%>" class="btn btn-info btn-paynow">
+									跟踪订单
+								</a>
+							<%}%>
 						</p>
 					</div>
 					<a class="order-product-thumb" href="/order/details?id=<%=order.id%>">
@@ -54,6 +61,49 @@
 				<a href="/" class="T-btn T-btn-red">现在就去淘一个</a>
 			</div>
 		<%}%>
+		<!-- script here -->
+		<script type="text/javascript">
+	      	var parseTime = function(t,num){
+	            var num = num||2
+	              ,t = t.toString()
+	              ;
+	            for(;num>t.length;num--){
+	              t='0'+t;
+	            }
+	            return t;
+	      	}
+			var getLocalFormat = function(date){
+			  var y=date.getFullYear()
+			      ,m=date.getMonth()+1
+			      ,d=date.getDate()
+			      ,h=date.getHours()
+			      ,mi=date.getMinutes()
+			      ,s=date.getSeconds()
+			    ;
+			  return y+'-'+parseTime(m)+'-'+parseTime(d)+' '+parseTime(h)+':'+parseTime(mi)+':'+parseTime(s)
+			} 
+			var orderStatus = <%-JSON.stringify(orderStatus)%>;
+			require(['jquery','user.main'],function($,main){
+				var contentLoader = main.contentLoader;
+				var loader = new contentLoader({
+					url:'/order/asyncComplete',
+					container:$('body'),
+					start:10,
+					success:function(data){
+						if(data){
+							var orderlist = data;
+							var str = '';
+							for(var i=0;i<orderlist.length;i++){
+								var order = orderlist[i];
+								str += '<div class="box"> <dl class="panel panel-default"> <dt class="panel-heading clearfix"> <span class="left"> 金额：<em class="order-price">￥'+order.amount+'</em> </span> <span class="right time"> 下单时间：<em>'+getLocalFormat(new Date(order.timestamp))+'</em> </span> </dt> <dd class="panel-body"> <div class="order-info"> <p> 订单编号： <span class="order-id">'+order.id+'</span> </p> <p> 订单状态： <span class="order-id text-warning"> '+orderStatus[order.status]+' </span> '+((order.status==orderStatus.delivered||order.status==orderStatus.checked)?'<a href="/order/track?id='+order.id+'" class="btn btn-info btn-paynow"> 跟踪订单 </a>':'')+'</p> </div> <a class="order-product-thumb" href="/order/details?id='+order.id+'"><span class="icon icon-arrow-right"></span><img src="'+order.product.thumbImageUrl[0]+'"/> <span class="order-poduct-info">'+order.product.title+'</span> </a> </dd> </dl> </div>';
+							}
+							$('body').append($(str))
+						}
+					}
+				})
+
+			})
+		</script>
 
 	</body>
 </html>

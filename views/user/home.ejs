@@ -14,7 +14,17 @@
 		<!-- 用户信息 -->
 		<div class="user-info">
 			<p>
-				账户：<span  class="user-name"><%=user.userName%></span><em class="icon icon-alipay">支付宝</em>
+				账户：<span  class="user-name"><%=user.userName%>
+				<%if(user.pid==loginPlatform.alipay){%>
+					<span class="icon-small icon-small-alipay">
+					 支付宝
+					</span>
+				<%}else if(user.pid==loginPlatform.weibo){%>
+					<span class="icon-small  icon-small-weibo">新浪微博</span>
+				<%}else if(user.pid==loginPlatform.qq){%>
+					<span class="icon-small  icon-small-qq">QQ</span>
+				<%}%>
+				<!-- </span><em class="icon icon-alipay">支付宝</em> -->
 			</p>
 		</div>
 		<!-- 快速导航 -->

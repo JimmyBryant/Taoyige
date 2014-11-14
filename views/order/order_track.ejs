@@ -31,7 +31,11 @@
 
 			<div class="section-box bg-white">
 				<div class="log-info">
-					<%=company.companyname%>：<%=express.nu%>
+					<%if(typeof company!='undefined'){%>
+						<%=company.companyname%>：<%=express.nu%>
+					<%}else{%>
+						订单跟踪
+					<%}%>
 				</div>
 			<% if(express.data) {%>
 				<ul class="log-details">

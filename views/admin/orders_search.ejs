@@ -2,7 +2,7 @@
 <html>
   <head>
     <% include ../template/admin_meta %>
-    <title>淘一个——订单管理</title>
+    <title>淘一个——订单查询</title>
   </head>
   <body>
     <%var nav_index=1;%>
@@ -30,8 +30,14 @@
               return y+'-'+parseTime(m)+'-'+parseTime(d)+' '+parseTime(h)+':'+parseTime(mi)+':'+parseTime(s)
           }          
         %>
-        <% var orders_nav='refundSuccess'; %>
-        <% include ../template/orders_nav %>
+        <fieldset class="order-search-field">
+          <form method="post">
+            <div class="field-group">
+              <label>订单编号：</label><input type="text" name="id" id="id" <%if(typeof id!='undefined'){%>value="<%=id%>"<%}%>>
+              <button class="btn btn-default">查询</button>
+            </div>
+          </form>
+        </fieldset>
         <!-- Tab panes -->
         <div class="tab-content">
           <div class="tab-pane active">        
@@ -66,13 +72,13 @@
                   <%var product = order.product||{};%>
                   <div class="thumb-list">
                   <a href="#" class="thumb-box"  target="_blank" title="<%=product.title%>">
-                  <img src="<%=order.product.thumbImageUrl[0]%>">
+                  <img  src="<%=product.thumbImageUrl[0]%>">
                   </a>
                   <span><%=product.title%></span>
                   </div>
                 </td>
                 <td>
-                  收货人：<span class="text-info"><%=(order.addressInfo&&order.addressInfo.name)%></span>
+                  <span class="text-info"><%=(order.addressInfo&&order.addressInfo.name)%></span>
                 </td>
                 <td class="price">
                   <span>￥<%=order.amount%></span>
@@ -81,10 +87,36 @@
                   <span><%=order.count%></span>  
                 </td>
                 <td class="status">
-                  <span class="text-info"><%=orderStatus[order.status]%></span>  
+                  <span class="text-info"><%=orderStatus[order.status]%></span>
+                  <%if(order.status=='unpaid'){%> 
+                  <%var expires=parseInt(order.timer)+parseInt(order.timestamp)-Date.now();;%>
+                  <label class="btn-tick time-tick" data-expires="<%=expires%>">
+                  <span class="glyphicon glyphicon-time"></span>
+                  <%var time = expires%>
+                  <em><%if(time<0){%>00:00<%}else{var m=Math.floor(time/60000),s=Math.ceil(time%60000/1000);%><%=parseTime(m)%>:<%=parseTime(s)%><%}%></em>
+                  </label> 
+                  <%}%>
                 </td>
                 <td class="operate">
-                <%if(order.status==orderStatus.refund){%>
+                  <%if(order.status=='unpaid'){%>
+                  <a class="btn btn-primary" target="_blank" href="/admin/orders/edit_price?id=<%=order.id%>">
+                    改价
+                  </a>
+                  <a class="btn btn-primary" target="_blank" href="/admin/orders/close?id=<%=order.id%>" onclick="return confirm('确定要关闭该订单？');">
+                    关闭订单
+                  </a>
+                  <%}else if(order.status==orderStatus.paid){%>
+                  <a class="btn btn-primary" target="_blank" href="/admin/orders/add_express?id=<%=order.id%>">
+                    发货
+                  </a>
+                  <a class="btn btn-danger" target="_blank" href="/admin/orders/setRefund?id=<%=order.id%>" onclick="if(confirm('确定设置为退款状态？')==false)return false;">
+                    退款给买家
+                  </a>    
+                <%}else if(order.status==orderStatus.delivered){%>
+                  <a class="btn btn-primary" target="_blank" href="/admin/orders/edit_express?id=<%=order.id%>">
+                    修改快递信息
+                  </a> 
+                <%}else if(order.status==orderStatus.refund){%>
                   <a class="btn btn-danger" target="_blank" href="/admin/orders/setRefundSuccess?id=<%=order.id%>" onclick="if(confirm('确定设置为退款成功？')==false)return false;">
                   完成退款
                   </a> 
@@ -96,9 +128,14 @@
           </table>
           </div>
         </div>
-        <% include ../template/pagination %>
+
       </div>      
     </div>
-
+    <!-- script -->
+    <script type="text/javascript">
+      require(['jquery','umain'],function($,main){
+        main.timeTick();
+      })
+    </script>
   </body>
 </html>

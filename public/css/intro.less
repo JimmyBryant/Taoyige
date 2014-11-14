@@ -1,0 +1,113 @@
+@import "variables";
+
+body{
+	background:url(../images/bg/chains.jpg);
+	font:14px/1.25em 'Microsoft YaHei', Arial, Helvetica, sans-serif;
+	min-width:320px;
+	min-height: 100%;
+	height: auto!important;
+	height: 100%;
+}
+.container{
+	min-width:320px;
+	padding:0;
+}
+header{
+	padding: @small;
+	background: #ED4720;
+	color: #FFF;
+	a{
+		color:#FFF;
+	}
+}
+.intro-wrapper{
+	h2{
+		font-family: 'Microsoft YaHei', "华文细黑","黑体";
+		font-size: 30px;
+		text-align:center;
+	}
+	.inner{
+		padding-top:@large*2;
+	}
+	.fr{
+		float:right;
+	}
+	.fl{
+		float:left;
+	}
+	.code-image-box{
+		width:176px;
+		overflow:hidden;
+	}
+	.code-image{
+		dt{
+			margin-bottom:@normal;
+		}
+		dd{
+			padding:@normal;
+			background:#FFF;
+			text-align:center;
+			overflow:hidden;
+			.border-radius(8px,8px,8px,8px);
+		}
+		dd>img{
+			width:160px;
+			height:160px;
+		}
+	}
+	.person{
+		margin-bottom:@large;
+		.photo{
+			display:inline-block;
+			*display:inline;
+			*zoom:1;
+			width:180px;
+			height:180px;
+			overflow:hidden;
+			border: 5px solid #fcfcfc;
+			vertical-align:top;
+			.border-radius(100%,100%,100%,100%);
+		}
+		.intro{			
+			display:inline-block;
+			*display:inline;
+			*zoom:1;
+			max-width:600px;
+			padding:@large;
+			line-height:20px;
+			vertical-align:top;
+
+			.title>.t1{
+				font-size:@large;
+			}
+			.details{
+				text-align:left;
+				color:gray;
+			}
+		}
+	}
+}
+footer{	
+	background:#ED4720;
+	margin-top: @large;
+	text-align: center;
+	color: #FFF;
+	padding: @large 0 @medium;
+}
+@media screen and (max-width:992px){
+	.intro-wrapper{
+		.code-image-box{
+			float:left;
+			width:100%;
+			text-align:center;
+			dl{
+				display:inline-block;
+				vertical-align:top;
+				margin-right:@medium;
+			}
+		}
+	 	.person{
+			text-align:center;
+		}	
+	}
+}
