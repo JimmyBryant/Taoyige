@@ -63,6 +63,43 @@ define(['jquery','M_alert'],function($,M_alert){
 				}
 				tick.text(v-1);
 			},1000);
+		},
+		// 异步获取用户信息
+		getProductInfo: function(){
+			var url = '/product/getProductInfo';
+			var id = $('#today-product-id').val();
+			$.get(url,{id:id},function(data){
+				if(data){
+					var user = data.user;
+					var product = data.product;
+
+					if(product){
+						// 销量
+						if($('.p-salevolume label').length){
+							$('.p-salevolume label span').text(product.salesVolume)
+						}else if($('.p-salevolume strong').length){
+							$('.p-salevolume strong').text(product.salesVolume)
+						}
+						// 库存
+						if($('.p-store label').length){
+							$('.p-store label span').text(product.count)
+						}else if($('.p-store span').length){
+							$('.p-store span').text(product.count)
+						}
+					}
+
+					if(user){
+						var htmlStr = '<a href="'+(user.role=='admin'?'admin/index':'/user/home')
+								+'" class="f-username">'
+								+ user.userName
+								+'</a><a href="/logout" class="f-logout">退出登录</a>'
+								;
+						$('.user-home b').addClass('user-online');
+						$('.footnav .left').html(htmlStr);
+					}
+
+				}
+			})
 		}
 	}
 

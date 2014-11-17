@@ -205,9 +205,11 @@
     <script type="text/javascript">
       require(['jquery','admin.main'],function($,main){
         main.validate($('#form-product'));
+        <%if(product){%>
         main.productImagesUrl = '<%=product.normalImageUrl%>'.split(',');
         main.productDetailsImagesUrl = '<%=product.detailsImageUrl||""%>'.split(',');
         main.productBannerUrl = '<%=product.bannerUrl%>';
+        <%}%>
         $('#productImage').on('change',function(){
           if($(this).val())
             main.uploadImage();

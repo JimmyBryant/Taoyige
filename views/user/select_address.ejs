@@ -24,7 +24,7 @@
 				<% for(var i=0;i<addressList.length;i++){ var addr = JSON.parse(addressList[i]);%>
 				<dd data-id="<%=addr.id%>" class="address-box<%if(addr.id==user.addressID){%> address-selected<%}%>">
 					<p><label><%=addr.name%></label><span class="addr-tel"><%=addr.mobilephone%></span></p>
-					<p><%=addressMap[addr.province]&&addressMap[addr.province][0]%><%=addressMap[addr.city]&&addressMap[addr.city][0]%><%=addressMap[addr.county]&&addressMap[addr.city][0]%><%=addr.details%></p>
+					<p><%=addressMap[addr.province]&&addressMap[addr.province][0]%><%=addressMap[addr.city]&&addressMap[addr.city][0]%><%=addressMap[addr.county]&&addressMap[addr.county][0]%><%=addr.details%></p>
 					<div class="addr-oper">
 						<a href="/user/editAddress?id=<%=addr.id%>&act=select" class="oper-item oper-edit"><span></span>修改</a>
 					</div>

@@ -2,10 +2,12 @@
 var orderManager = require('../base/orderManager')
 	,orderStatus = orderManager.orderStatus
 	,productManager = require('../base/productManager')
+	,productStatus = productManager.productStatus
 	,mapper = require('xto').mapper
 	,gm = require('gm')
 	,node_path = require('path')
 	,fs = require('fs')
+	,ejs = require('ejs')
 	,_ = require('underscore')
 	;
 
@@ -638,8 +640,19 @@ function postProduct(req,res){
 				if(err){
 					res.send('出错了')
 				}else{
-					var id = replies;
-					res.render('admin/product_success',{type:2,id:id,user:user})
+					var product = replies;
+					// 生成静态页面
+					HTML_productDetails(product);
+					// 如果编辑的是正在销售的商品，则重新生成首页html页面
+					if(product.status==productStatus.onSale){
+						productManager.getProductReadySale(function(err,replies){
+							var readylist = replies||[];
+							HTML_index(product,readylist);
+							res.render('admin/product_success',{type:2,id:id,user:user})
+						})
+					}else{
+						res.render('admin/product_success',{type:2,id:id,user:user})
+					}					
 				}
 			})
 		}else{
@@ -647,8 +660,20 @@ function postProduct(req,res){
 				if(err){
 					res.send('出错了')
 				}else{
-					var id = replies;
-					res.render('admin/product_success',{type:1,id:id,user:user})
+					var product = replies;
+					var id = product.id;
+					// 生成静态页面
+					HTML_productDetails(product);
+					// 如果添加的商品是马上上架，则生成首页html页面
+					if(product.status==productStatus.onSale){
+						productManager.getProductReadySale(function(err,replies){
+							var readylist = replies||[];
+							HTML_index(product,readylist);
+							res.render('admin/product_success',{type:2,id:id,user:user})
+						})
+					}else{
+						res.render('admin/product_success',{type:2,id:id,user:user})
+					}
 				}
 			})
 		}
@@ -686,6 +711,26 @@ function getIdleArr(callback){
 	});
 }
 
+// 生成商品详情html静态页面
+function HTML_productDetails(product){
+	var path = node_path.join(__dirname,'../views/product/product_details.ejs')		
+		,htmlStr = ejs.render(fs.readFileSync(path,'utf-8'),{product:product,filename:path})	// 注意ejs.render方法需要传入filename属性，即ejs文件路径
+		,name = 'product_'+product.id+'.html'
+		,html_path = node_path.join(__dirname,'../public/html/products/',name)
+		;
+	fs.writeFileSync(html_path,htmlStr);
+}
+
+// 为首页生成静态页面
+function HTML_index(product,readylist){
+	var path = node_path.join(__dirname,'../views/index.ejs')		
+		,htmlStr = ejs.render(fs.readFileSync(path,'utf-8'),{product:product,readylist:readylist,user:null,filename:path})	// 注意ejs.render方法需要传入filename属性，即ejs文件路径
+		,name = new Date(new Date().toDateString()).valueOf()+'.html'
+		,html_path = node_path.join(__dirname,'../public/html/',name)
+		;
+	fs.writeFileSync(html_path,htmlStr);	
+}
+
 function control (obj,req,res,next){
 	var action = req.params.action		
 		;
@@ -708,3 +753,4 @@ module.exports.order = function(req,res,next){
 module.exports.product = function(req,res,next){
 	control(product,req,res,next)
 }
+module.exports.HTML_index = HTML_index;

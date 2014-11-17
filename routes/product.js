@@ -23,6 +23,25 @@ var actions = {
 				res.render('product/product_details',{user:user,product:product})
 			});
 		}
+	},
+	// 返回商品销量和库存已经登录用户信息 
+	// return JSON Object
+	getProductInfo: function(req,res){
+		var id = req.query.id;
+		if(id){
+			productManager.getProduct(id,function(err,replies){
+				var product = null;
+				if(replies){
+					product = JSON.parse(replies)
+				}
+				res.send({product:{
+					salesVolume:product.salesVolume,
+					count:product.count
+				},user:user})
+			});
+		}else{
+			res.send({product:null,user:user})
+		}
 	}
 }
 

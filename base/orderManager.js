@@ -17,7 +17,7 @@ var orderStatus = {
 	deleted:6,	//订单已删除
 	refund:7,	//退款中 必须在已付款的状态下才能申请退款
 	refundSuccess:8,	//退款成功
-	returnGoods:8,	//退货中
+	returnGoods:9,	//退货中
 	returnGoodsSuccess:10,	//已经收到到退货
 	
 	1:'等待付款',

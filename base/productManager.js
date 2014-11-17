@@ -87,11 +87,11 @@ module.exports = {
 								if((status == productStatus.onSale||status == productStatus.ready)&&prev_saleID){
 									setProductStatus(prev_saleID,productStatus.store,function(err,replies){
 										redisCli.lpush(storeKey,prev_saleID,function(err,replies){
-											callback(null,product.id)
+											callback(null,product)
 										})
 									})
 								}else{
-									callback(null,product.id)
+									callback(null,product)
 								}														
 							}
 						});
@@ -155,11 +155,11 @@ module.exports = {
 							if((status==productStatus.onSale||status==productStatus.ready)&&prev_saleID&&prev_saleID!=id){
 								setProductStatus(prev_saleID,productStatus.store,function(){
 									redisCli.lpush(storeKey,prev_saleID,function(err,replies){
-										callback(null,product.id)
+										callback(null,product)
 									})
 								})
 							}else{
-								callback(null,product.id)
+								callback(null,product)
 							}							
 						}
 					})
@@ -357,10 +357,10 @@ module.exports = {
 						if(err){
 							callback(err)
 						}else{
-							var date = new Date().getDate().toString();	
+							var dateTime = new Date(new Date().toDateString()).getTime().toString();
 							// 获取排期为当日的商品ID
-							if(_.contains(replies,date)){
-								redisCli.hget(readyKey,date,function(err,replies){
+							if(_.contains(replies,dateTime)){
+								redisCli.hget(readyKey,dateTime,function(err,replies){
 									if(err){
 										callback(err)
 									}else{
@@ -374,7 +374,7 @@ module.exports = {
 												// 从排期队列中删除该商品
 												// 将该商品设置为销售中的商品
 												var multi = redisCli.multi();										
-												multi.hdel(readyKey,date).set(saleKey,id)
+												multi.hdel(readyKey,dateTime).set(saleKey,id)
 												.exec(function(err,replies){
 													if(err){
 														callback(err)

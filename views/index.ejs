@@ -10,7 +10,7 @@
   		<header class="index-header">
   			<div class="h-left">
   				<a href="/user/home" class="user-home">
-            用户中心<%if(user){%><b></b><%}%>
+            用户中心<b <%if(user){%>class="user-online"<%}%>></b>
           </a>
   				<div class="h-slogan">
   					<span>闪淘五湖四海</span>
@@ -27,15 +27,15 @@
   		<div id="sale-today">
         <%if(product){%>
         <input type="hidden" id="today-product-id" value="<%=product.id%>"/>
-        <a href="/product/details?id=<%=product.id%>" class="p-image-box">
+        <a href="/html/products/product_<%=product.id%>.html" class="p-image-box">
         	<img alt="<%=product.title%>" src="<%=product.largeImageUrl[0]%>"/>
         </a>
         <p class="p-title">
           <%-product.title%>
         </p>
   			<ul class="sale-desc clearfix">
-  				<li class="p-sales"><span class="p-icon"></span><label>已售：<span><%=product.salesVolume%>件</span></label></li>
-				<li class="p-store"><span class="p-icon"></span><label>库存：<span><%=product.count%>件</span></label></li>
+  				<li class="p-salevolume"><span class="p-icon"></span><label>已售：<span></span>件</label></li>
+				<li class="p-store"><span class="p-icon"></span><label>库存：<span></span>件</label></li>
   			</ul>
   			<div class="p-action clearfix">
   				<div class="left">
@@ -69,7 +69,7 @@
   					</a>
   				</td>
   				<td>
-	  				<a href="/product/details?id=<%=p.id%>" class="cont">
+	  				<a href="/html/products/product_<%=p.id%>.html" class="cont">
 	  					<img src="<%=p.bannerUrl%>"/>
 	  				</a>	
   				</td>
@@ -81,13 +81,13 @@
       <!-- script -->
       <script type="text/javascript">
         require(['jquery','main'],function ($,main) {
-
+          main.getProductInfo();
         })
       </script>
   	</div>
-    <!-- 客户代码 -->
+    <!-- 客服代码 -->
     <script src="https://s.meiqia.com/js/unit/button.js?id=3642" charset="UTF-8"></script>
     <!-- CNZZ统计 -->
-    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1253476325'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1253476325%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>     
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1253476325'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1253476325%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>        
   </body>
 </html>

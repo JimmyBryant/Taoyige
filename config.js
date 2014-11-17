@@ -1,8 +1,8 @@
 module.exports = {
-	"host":"http://192.168.1.108:3001",
-	"shost":"http://192.168.1.108:3001",
-	"mhost":"http://192.168.1.108:3001/welcome",	//触屏版域名
-	"admin_host":"http://192.168.1.108:3001",
+	"host":"http://192.168.1.106:3001",
+	"shost":"http://192.168.1.106:3001",
+	"mhost":"http://192.168.1.106:3001/welcome",	//触屏版域名
+	"admin_host":"http://192.168.1.106:3001",
 	"port":"3001",
 	"env":"development",
 	"redis":{

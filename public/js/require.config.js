@@ -14,7 +14,8 @@ require.config({
 		'umain':'user.main',
 		'M_validate':'mobile.validate',
 		'M_alert':'mobile.alert',
-		'jform':'jquery.form.min'
+		'jform':'jquery.form.min',
+		'lazy':'jquery.lazyload.min'
 	},
 	shim:{
 		'swiper':{
@@ -24,6 +25,9 @@ require.config({
 			deps: ['jquery']
 		},
 		'modal':{
+			deps: ['jquery']
+		},
+		'jform':{
 			deps: ['jquery']
 		},
 		'jform':{

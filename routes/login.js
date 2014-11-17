@@ -227,7 +227,7 @@ module.exports.autoLogin = function(req,res,next){
 		,authCookie = config.cookie.authCookie
 		,path = req.path.length>1&&req.path.lastIndexOf('/')==req.path.length-1?req.path.substr(0,req.path.length-1):req.path
 		,noLoginUrl = ['/','/about','/welcome','/login','/logout','/loginRedirect','/loginReferer','/loginReturn','/purchase/pay_notify',
-				'/product/details']
+				'/product/details','/product/getUserInfo']
 		,isAdminPath = path.indexOf('/admin')!=-1
 		;
 	if(isAdminPath){

@@ -159,7 +159,7 @@ header{
 			line-height: 20em;
 			margin-right:@medium;
 			vertical-align: middle;
-			b{
+			b.user-online{
 				display: block;
 				position: absolute;
 				width: 7px;
@@ -294,7 +294,7 @@ header{
 				display:inline-block;
 			}
 		}
-		.p-sales .p-icon{
+		.p-salevolume .p-icon{
 			background: url(../images/common/tag.png) 8px 4px no-repeat #099d91;
 			background-size: 28px;
 		}
@@ -305,7 +305,7 @@ header{
 	}
 }
 
-.p-action,.shopping-action{
+.p-action{
 	color:#FF3201;
 	font-size:@font_medium;
 	padding: 1px 0;
@@ -375,14 +375,33 @@ header{
 	}
 
 }
-
 .shopping-action{
-	border-top:1px solid @base_col2;
-	background:#FFF;
+	padding:@normal @medium;
+	color:#FFF;	
+	.left{
+		float:left;
+	}
+	.right{
+		float:right;
+	}
 	.left p{
-		height:30px;
-		line-height:30px;
+		font-size:14px;
+		line-height:22px;
 		padding-left:@small;
+	}
+	.left .p-salevolume{
+		strong{
+			font-size:16px;
+			color:yellow;
+		}
+	}
+	.btn-shopping-now{
+		background: yellow;
+		display: inline-block;
+		color: red;
+		font-weight: bold;
+		padding-left: 30px;
+		padding-right: 30px;
 	}
 }
 #sale-soon-list{
@@ -628,7 +647,7 @@ footer{
 			line-height:20px;
 		}
 	}
-	.p-action,.shopping-action{
+	.p-action{
 		font-size:@font_normal;
 		.left{
 			.p-nowprice{
@@ -654,8 +673,7 @@ footer{
 	}
 	.shopping-action{
 		.left p{
-			height:24px;
-			line-height:24px;
+
 		}
 	}
 }
