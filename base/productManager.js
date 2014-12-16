@@ -318,12 +318,15 @@ module.exports = {
 		redisCli.get(saleKey,function(err,replies){
 			if(err){
 				callback(err)
-			}else{							
+			}else{						
 				if(replies){
 					var id = replies;
 					getProduct(id,function(err,replies){
 						if(err){
 							callback(err);
+							return;
+						}else if(!replies){
+							callback(null,null);
 							return;
 						}
 						var product = JSON.parse(replies);
@@ -416,7 +419,7 @@ module.exports = {
 			}
 		})
 	},
-	// 获取排期销售的商品
+	// 获取所有排期销售的商品
 	getProductReadySale: function(callback){
 		redisCli.hgetall(readyKey,function(err,replies){
 			if(err){
@@ -437,6 +440,30 @@ module.exports = {
 				});
 			}
 		})
+	},
+	// 获取即将上架的商品
+	getCommingSoon: function(callback){
+		redisCli.hgetall(readyKey,function(err,replies){
+			
+			if(err||!replies){
+				callback(err,replies)
+			}else{
+				var productID = '';
+				for(var i in replies){
+					if(new Date(parseInt(i)).getDate()==new Date(Date.now()+1000*3600*24).getDate()){
+						productID = replies[i];
+						break;
+					}
+				}
+				redisCli.hget(productKey,productID,function(err,replies){
+					if(err){
+						callback(err)
+					}else{
+						callback(null,replies);
+					}
+				});
+			}
+		})		
 	},
 	/*
 	* 获取仓库中的商品

@@ -1,6 +1,6 @@
 #! /bin/sh
 APP_PATH=/instreet/cluster/taoyige/TaoOne
-APP=$APP_PATH/bin/www
+APP=$APP_PATH/bin/cluster
 APP_NAME=Taoyige
 LOGFILE=/dev/null
 LOGPATH=$APP_PATH/log

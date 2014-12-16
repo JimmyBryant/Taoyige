@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../template/admin_meta %>
+    <title>淘一个——安卓客户端信息管理</title>
+    <link rel="stylesheet" type="text/css" href="/css/jquery.datepick.css">
+  </head>
+  <body>
+    <%var nav_index=4;%>
+    <% include ../template/admin_header %>
+    <div class="main-content-wrapper">
+      <div class="container">        
+
+        <div class="panel panel-info">
+          <div class="panel-heading">
+            <strong>填写安卓应用版本信息</strong>
+          </div>
+          <div class="panel-body">
+            <form class="form-horizontal"
+              method="post">    
+            <div class="form-group">
+              <label class="col-sm-2 control-label">
+                应用名称：
+              </label>
+              <div class="col-sm-4">
+                <input type="text" class="form-control" value="淘一个" disabled="true" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-sm-2 control-label">
+                版本名称：
+              </label>
+              <div class="col-sm-4">
+                <input name="versionName" class="form-control" type="text" value="<%=app?app.versionName:''%>"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">
+                版本号：
+              </label>
+              <div class="col-sm-4">
+                <input name="versionCode" class="form-control" type="text" value="<%=app?app.versionCode:''%>"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">
+                下载地址：
+              </label>
+              <div class="col-sm-4">
+                <input name="downloadUrl" class="form-control" type="text" value="<%=app?app.downloadUrl:''%>"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">
+                更新日志：
+              </label>
+              <div class="col-sm-4">
+                <textarea name="updateLog" class="form-control" rows="5" cols="100"><%=app?app.updateLog:''%></textarea>
+              </div>
+            </div> 
+            <div class="form-group">
+              <label class="col-sm-2 control-label">
+                首屏图片地址：
+              </label>
+              <div class="col-sm-4">
+                <textarea name="imglist" class="form-control" rows="5" cols="100"><%if(app&&app.imglist){%><%=app.imglist%><%}%></textarea>
+                <span class="text-warning">*图片地址请用逗号隔开</span>
+              </div>
+            </div>  
+            <div class="form-group">
+              <label class="col-sm-2 control-label">
+                首屏图片有效时间：
+              </label>
+              <div class="col-sm-4">
+                <input type="text" class="date-range form-control" name="dateRange" value="<%=app?app.startDate+' - '+app.endDate:''%>"/>
+              </div>
+            </div>  
+            <div class="form-group">
+              <label class="col-sm-2 control-label">
+                首屏图片是否生效：
+              </label>
+              <div class="col-sm-1">
+                <select class="form-control" name="updateActive">
+                  <option value="1">
+                    是
+                  </option>
+                  <option value="0" <%=app&&app.update==false?'selected':''%>>
+                    否
+                  </option>
+                </select>
+              </div>
+            </div>                           
+            <div class="form-group">
+              <div class="col-sm-2">
+              </div>
+              <div class="col-sm-4">
+                <button  class="btn btn-primary" type="submit">
+                  保存信息
+                </button>
+              </div>
+            </div>
+          </form>
+
+        </div>
+      </div>  
+
+      </div>      
+    </div>
+    <script type="text/javascript">
+      require(['jquery','jdatepick','jdatepick_zh'],function($){
+        var dateOpts = {
+          minDate:0,
+          rangeSelect:true,
+          monthsToShow: 2
+        }
+        $('.date-range').datepick(dateOpts);
+      })
+    </script>
+  </body>
+</html>

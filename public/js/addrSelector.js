@@ -25,15 +25,28 @@ define(['jquery','addressData'],function ($,data) {
         });
     }
 	addrSelector.prototype.addressChange = function($selector,$cascading){	    
-	    var val = $selector.val();
+	    var val = parseInt($selector.val())
+            ,n = 0
+            ,$opt = null
+            ;
 	    $cascading.empty();
+        $cascading.prepend($('<option value="0">请选择</option>'));
 	    for(var i in data){
-	         if(val == data[i][1]){
-				$cascading.append($('<option value="'+i+'">'+data[i][0]+'</otpn>'));
-	         }
+            if(val == data[i][1]){
+                $opt = $('<option value="'+i+'">'+data[i][0]+'</otpn>');
+                $cascading.append($opt);
+                n++;                
+            }
 	    }
-	    $cascading.prepend($('<option value="0">请选择</option>'));
-
+        // 当上一级有值且目前的选项不存在时候才显示空        
+        if(val&&n==0){
+            $opt = $('<option value="-1">无</option>');
+            $cascading.html($opt);
+            n++;
+        }
+        if(n==1&&$opt){
+            $opt.attr('selected',true)
+        }	    
 	}
     addrSelector.prototype.select = function(p,c,co){
         var _this = this

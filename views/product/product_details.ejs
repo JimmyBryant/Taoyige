@@ -40,19 +40,24 @@
   				<div class="left">
   					<label class="p-nowprice">
   						<strong>￥<%=product.price%></strong>
+  						<span class="p-tags">
+	  						<span class="p-nochange">一口价</span>
+							<span class="p-discount">
+							<%=(Math.round(product.price/product.oriPrice*100)/10)%>折
+	  						</span>
+  						</span>
   					</label>
   				</div>
   				<div class="right">
-  					<label >
-  						<span>
-  							<%=product.salesVolume%>人已抢购
-  						</span>
-  						<span class="p-price">
-  							市场价：<del>￥<%=product.oriPrice%></del>
-  							<em><%=(Math.round(product.price/product.oriPrice*100)/10)%>折
-  							</em>
-  						</span>
+  					<label class="p-additional">
+  						<strong><%=product.salesVolume%></strong>人已抢购
   					</label>
+  					<label class="p-additional">
+  						<span class="p-price">
+  							市场价:
+  							<span>￥</span><del><%=product.oriPrice%></del>
+  						</span>  					
+  					</label>	
   				</div>
   			</div>
 		</div>

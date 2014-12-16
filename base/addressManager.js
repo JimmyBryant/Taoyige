@@ -17,7 +17,6 @@ var address = {
 	telephone:'',	//电话号码
 	postcode:'',	//邮箱
 	setDefault:false	//是否为默认地址
-
 }
 
 var addressKey = redisKey.address
@@ -41,12 +40,12 @@ module.exports = {
 					address.timestamp = Date.now();
 					var multi = redisCli.multi();
 					multi.hset(addressKey,id,JSON.stringify(address))
-					.rpush(redisKey.getUserAddressKey(address.userID),id)
+					.lpush(redisKey.getUserAddressKey(address.userID),id)
 					.exec(function(err,replies){
 						if(err){
 							callback(err)
 						}else{
-							callback(null,replies)
+							callback(null,address)
 						}
 					});
 				}
@@ -88,7 +87,7 @@ module.exports = {
 				}
 			});
 		}else{
-			callback('无法删除订单')
+			callback('address id or user id err')
 		}
 	},
 	//根据address id获取地址信息
@@ -138,12 +137,17 @@ module.exports = {
 					callback(err)
 				}else{
 					var fieldList = replies;
-					redisCli.hmget(addressKey,fieldList,function(err,replies){
-						if(err)
-							callback(err)
-						else 
-							callback(null,replies)
-					})
+					if(fieldList.length){
+						redisCli.hmget(addressKey,fieldList,function(err,replies){
+							if(err)
+								callback(err)
+							else 
+								callback(null,replies)
+						})						
+					}else{
+						callback(null,null)
+					}
+
 				}
 			})
 		}else{

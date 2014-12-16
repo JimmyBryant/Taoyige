@@ -28,9 +28,9 @@
                   ,s=date.getSeconds()
                 ;
               return y+'-'+parseTime(m)+'-'+parseTime(d)+' '+parseTime(h)+':'+parseTime(mi)+':'+parseTime(s)
-          }
+          }          
         %>
-        <% var orders_nav='unpaid'; %>
+        <% var orders_nav='received'; %>
         <% include ../template/orders_nav %>
         <!-- Tab panes -->
         <div class="tab-content">
@@ -57,7 +57,7 @@
                   <span class="text-primary"><%=order.id%></span>
                   <span class="dealtime"><%=getLocalFormat(D)%></span>
                   <label class="fr">
-                    用户：<a href="#"><%=order.user&&order.user.userName%></a>
+                    用户：<a href="#"><%=order.user.userName%></a>
                   </label>                   
                 </td>
               </tr>
@@ -66,13 +66,13 @@
                   <%var product = order.product||{};%>
                   <div class="thumb-list">
                   <a href="#" class="thumb-box"  target="_blank" title="<%=product.title%>">
-                  <img  src="<%=product.thumbImageUrl[0]%>">
+                  <img src="<%=order.product.thumbImageUrl[0]%>">
                   </a>
                   <span><%=product.title%></span>
                   </div>
                 </td>
                 <td>
-                  <span class="text-info"><%=(order.addressInfo&&order.addressInfo.name)%></span>
+                  收货人：<span class="text-info"><%=(order.addressInfo&&order.addressInfo.name)%></span>
                 </td>
                 <td class="price">
                   <span>￥<%=order.amount%></span>
@@ -81,20 +81,10 @@
                   <span><%=order.count%></span>  
                 </td>
                 <td class="status">
-                  <span class="text-info"><%=orderStatus[order.status]%></span> 
-                  <%var expires=parseInt(order.timer)+parseInt(order.timestamp)-Date.now();var time = expires;%>
-                  <label class="btn-tick time-tick" data-expires="<%=expires%>">
-                  <span class="glyphicon glyphicon-time"></span>
-                  <em><%if(time<0){%>00:00<%}else{var m=Math.floor(time/60000),s=Math.ceil(time%60000/1000);%><%=parseTime(m)%>:<%=parseTime(s)%><%}%></em>
-                  </label> 
+                  <span class="text-info"><%=orderStatus[order.status]%></span>  
                 </td>
                 <td class="operate">
-                  <a class="btn btn-primary" target="_blank" href="/admin/orders/edit_price?id=<%=order.id%>">
-                    改价
-                  </a>
-                  <a class="btn btn-primary" target="_blank" href="/admin/orders/close?id=<%=order.id%>" onclick="return confirm('确定要关闭该订单？');">
-                    关闭订单
-                  </a>   
+
                 </td>
               </tr>
             </tbody>
@@ -105,11 +95,6 @@
         <% include ../template/pagination %>
       </div>      
     </div>
-    <!-- script -->
-    <script type="text/javascript">
-      require(['jquery','admin.main'],function($,main){
-        main.timeTick();
-      })
-    </script>
+
   </body>
 </html>

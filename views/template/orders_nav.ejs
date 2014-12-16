@@ -1,8 +1,8 @@
 	<ul class="nav nav-tabs">
 	  <li <%if(orders_nav=='paid'){%>class="active"<%}%>><a href="/admin/orders/index">待发货订单</a></li>
-	  <li <%if(orders_nav=='delivered'){%>class="active"<%}%>><a href="/admin/orders/delivered">已发货订单</a></li>
-	  <!-- <li <%if(orders_nav=='complete'){%>class="active"<%}%>><a href="/admin/orders/complete">已完成订单</a></li> -->
   	  <li <%if(orders_nav=='unpaid'){%>class="active"<%}%>><a href="/admin/orders/unpaid">未付款订单</a></li>
 	  <li <%if(orders_nav=='refund'){%>class="active"<%}%>><a href="/admin/orders/refund">退款中订单</a></li>
 	  <li <%if(orders_nav=='refundSuccess'){%>class="active"<%}%>><a href="/admin/orders/refundSuccess">退款完成订单</a></li>
+  	  <li <%if(orders_nav=='delivered'){%>class="active"<%}%>><a href="/admin/orders/delivered">已发货订单</a></li>
+	  <li <%if(orders_nav=='received'){%>class="active"<%}%>><a href="/admin/orders/received">已完成订单</a></li>
 	</ul>

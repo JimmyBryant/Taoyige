@@ -66,7 +66,8 @@ var getCart = function(uid,callback){
 			if(err){
 				callback(err)
 			}else{
-				callback(null,replies)
+				var cart = JSON.parse(replies);
+				callback(null,cart)
 			}				
 		})
 	}else{

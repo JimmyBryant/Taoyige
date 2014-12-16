@@ -31,11 +31,12 @@ var actions = {
 							mobilephone: address.mobilephone,
 							details:addressMap[address.province][0]+addressMap[address.city][0]+addressMap[address.city][0]+address.details
 						};
+						// 获取购物车信息
 						cartManager.getCart(uid,function(err,replies){
 							if(err||!replies){
 								res.redirect('/user/home')
 							}else{
-								var cart = JSON.parse(replies);								
+								var cart = replies;								
 								res.render('order/order_create',{user:user,cart:cart,addr:address,addressMap:addressMap})
 							}
 						});
@@ -53,7 +54,7 @@ var actions = {
 				if(err||!replies){
 					res.send('创建订单失败')
 				}else{
-					var cart = JSON.parse(replies);					
+					var cart = replies;					
 					var freight = 0
 						,totalPrice = cart.price*cart.count
 						,oriPrice = cart.oriPrice*cart.count
@@ -62,11 +63,10 @@ var actions = {
 						userID: uid,
 						productID:cart.productID,
 						count:cart.count,
-						freight:0,	//运费
+						freight:freight,	//运费
 						oriPrice:oriPrice,	// 商品原价总金额
 						totalPrice:totalPrice,	//商品总金额
 						amount:totalPrice+freight,	//订单总金额						
-						paymentplatform: 2,
 						addressInfo:req.session.address
 					}
 					orderManager.createOrder(order,function(err,replies){

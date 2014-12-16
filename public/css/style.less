@@ -119,6 +119,57 @@ h2{
 }
 .body-white{
 	background:white;
+	line-height:0;
+}
+#client-app-banner{
+	display:none;
+	background:#383535;
+	color:#FFF;
+	line-height:0;
+	position:relative;
+	.app-close-btn{
+		position: absolute;
+		left: 0;
+		top: 0;
+		line-height: 64px;
+		text-align: center;
+		font-size: 28px;
+		padding: 0 8px;
+		color: #E5E5E5;
+		font-family: serif;
+	}
+	.app-wrapper{
+		width: 320px;
+		margin: 0 auto;
+		padding: @normal 0 @normal 40px;
+		.app-icon{
+			width:48px;
+			vertical-align:top;
+			margin-right:@normal;
+		}
+		.app-text{
+			display: inline-block;
+			line-height: 22px;
+			vertical-align: top;
+			margin-right:@normal;
+			strong{
+				display:block;
+			}
+			em{
+				font-style:normal;
+				font-size:@font_small;
+				color:#CCC;
+			}			
+		}
+		.app-go{
+			display:inline-block;
+			background: url(../images/bg/white_right_arrow.png) center right no-repeat;
+			width:25px;
+			height: 48px;
+			vertical-align: top;
+			background-size: 25px;
+		}
+	}
 }
 header{ 
 	text-align:center;
@@ -271,6 +322,9 @@ header{
 		line-height:24px;
 		color: #000;
 		padding: @normal;
+		.p-tip{
+			color:#FF9508
+		}
 	}
 	.sale-desc{
 		color:#FFF;
@@ -313,41 +367,78 @@ header{
 		display:inline-block;
 		vertical-align:top;
 		text-align:right;
-		span{
-			display:block;
-		}
 	}
-
+	.p-price{
+		color:#999;	
+	}
 	.left{
 		float:left;
+		width: 60%;
+		overflow: hidden;
 		.p-nowprice{
-			padding:0 @normal;
-			font-size: 46px;
-			line-height: 60px;
-			font-family: arial;
+			display:block;			
+			height: 46px;
+			text-align:left;			
+			font-family: arial;		
+			strong{
+				font-size: 36px;
+				line-height: 46px;
+				display: inline-block;
+				margin-right:@normal;
+				vertical-align:middle;					
+			}
+		}
+		.p-tags{
+			display:inline-block;
+			font-family: arial,sans-serif;
+			font-size: 12px;	
+			vertical-align:middle;		
+			.p-nochange,.p-discount{
+				display:inline-block;				
+				background: #FF8181;
+				color: #FFF;
+				line-height: 12px;
+				vertical-align: middle;
+				padding: 2px @small;
+			}
+			.p-discount{
+				background: #9D9D9D;
+			}
+		}
+		.p-additional{
+			display:block;
+			text-align:left;
+			height:18px;			
+			span{
+				display:inline;
+			}
 		}
 	}
-
+	.p-additional{
+		display:block;
+		padding:0 8px;
+		.p-price span{
+			font-family:arial;
+		}
+	}
+	.p-additional,.right{
+		.p-discount{
+			padding: 3px 5px;
+			background: #9D9D9D;
+			color: #FFF;
+		}
+	}
 	.right{
 		float:right;
-		label{
+		label{		
 			color:#666;
-			margin-right:@normal;
-			line-height:30px;
+			line-height:23px;
 		}
 		em{
-			font-style:normal;
-		}
-		.p-price{
-			em{
-				color:#333;
-			}		
-		}
-		.p-discount>em{
-			padding: 3px 5px;
-			background: rgb(104, 104, 104);
+			padding: 0 2px;
+			background: #9D9D9D;
 			color: #FFF;
-			font-style: normal;
+			font-style:normal;
 		}
 		.btn-shopping-now{
 			position: relative;
@@ -355,8 +446,8 @@ header{
 			display: inline-block;
 			color: #FFF;
 			font-size: 18px;
-			height: 60px;
-			line-height: 60px;
+			height: 64px;
+			line-height: 64px;
 			width: 160px;
 			text-align: center;
 		}
@@ -609,6 +700,28 @@ footer{
 	}
 }
 @media screen and (max-width:480px){
+	#client-app-banner{
+		.app-close-btn{
+			line-height:56px;
+		}
+		.app-wrapper{
+			padding: @small 0 @small 40px;
+			.app-text{
+				display: inline-block;
+				line-height: 22px;
+				vertical-align: top;
+				margin-right:@normal;
+				strong{
+					display:block;
+				}
+				em{
+					font-style:normal;
+					font-size:@font_small;
+					color:#CCC;
+				}			
+			}
+		}
+	}
 	.login-box h1{
 		font-size:@font_medium;
 	}
@@ -651,23 +764,41 @@ footer{
 		font-size:@font_normal;
 		.left{
 			.p-nowprice{
-				font-size:20px;
-				line-height:48px;
+				height:34px;
+				strong{
+					font-size:24px;
+					line-height:34px;
+					margin-right:@small;
+				}
+			}
+			.p-additional{
+				font-size:12px;
+				line-height:16px;
+				height:16px;
 			}
 		}
 		.right{
 			label{
 				font-size:@font_small;
-				line-height:24px;
+				line-height:20px;
+				strong{
+					font-weight:normal;
+				}
+				em{
+					padding:0 @mini;
+				}
 			}
 			.btn-shopping-now{
-				width:110px;
-				height:48px;
-				line-height:48px;
+				width:120px;
+				height:50px;
+				line-height:50px;
 			}
 			.btn-shopping-now:before{
 				top:16px;
 			}
+		}
+		.p-additional{
+			padding:0 @small;
 		}
 
 	}

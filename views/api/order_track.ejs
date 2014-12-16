@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<%include ../template/hmeta %>
+		<style type="text/css">
+		@media screen and (max-width: 480px){
+			.breif-product-box .product-info{
+				font-size: 14px;
+			}
+		}
+		</style>
+	</head>	
+	<body>
+		<header>
+			<div class="user-header">
+				<a href="javascript:;" class="h-left h-back"><span>返回</span></a>
+				<h2>物流详情</h2>
+				<a href="/" class="h-right h-home"><span>主页</span></a>
+			</div>
+		</header>
+
+	
+		<div class="main">
+			<%if(order){var product = order.product;%>
+			<div class="breif-product-box">
+				<a class="product-thumb" href="javascript:;">
+					<img src="<%=global.appConfig.shost+product.thumbImageUrl[0]%>"/>	
+					<span class="product-info">
+						<div class="p-title" style="margin-bottom: 8px;"><%=product.title%>
+						</div>
+						<div>
+							<span class="p-price">￥<%=order.amount%></span>
+							<span class="text-muted margin-lr-medium">X<%=order.count%></span>
+						</div>
+					</span>			
+				</a>
+			</div>
+
+			<div class="section-box bg-white">
+				<div class="log-info">
+					<%if(typeof company!='undefined'){%>
+						<%=company.companyname%>：<%=express.nu%>
+					<%}else{%>
+						订单跟踪
+					<%}%>
+				</div>
+			<% if(express.data) {%>
+				<ul class="log-details">
+					<%for(var i=0,len=express.data.length;i<len;i++){var log = express.data[i];%>
+					<li <%if(i==0&&express.ischeck==1){%>class="log-checked"<%}%>>
+						<div class="cont">
+							<p style="font-size:14px;line-height:22px;"><%=log.context%></p>
+							<span><%=log.time%></span>
+						</div>
+					</li>
+					<%}%>
+				</ul>
+			<%}%>
+			</div>
+			<%}%>
+		</div>
+
+	</body>
+</html>

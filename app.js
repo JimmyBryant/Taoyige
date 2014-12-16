@@ -13,15 +13,24 @@ var routes = require('./routes/index');
 var config = require('./config')
 var app = express();
 
+// config log4js
+log4js.configure({
+    appenders: [
+        { type: 'console' },
+        { type: 'file', filename: 'logs/taoyige.log', category: 'http' }
+    ]
+});
+
 // set env
 app.set('env',config.env);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
+// fav ico
 app.use(favicon(path.join(__dirname, 'public/images/favicon.ico')));
-// app.use(log4js.connectLogger(log4js.getLogger("http"), { level: 'auto' }));
-app.use(logger('dev'));
+// set logger
+app.use(log4js.connectLogger(log4js.getLogger("http"), { level: 'auto' }));
+// app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser(config.cookie.secret,{

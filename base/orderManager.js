@@ -2,6 +2,7 @@
 var redisCli = require('./redisCli')
 	,redisKey = require('./redisKey')
 	,productManager = require('./productManager')
+	,productStatus = productManager.productStatus
 	,addressManager = require('./addressManager')
 	,_ = require('underscore')
 	,CronJob = require('cron').CronJob
@@ -12,7 +13,7 @@ var orderStatus = {
 	unpaid: 1,	//未付款
 	paid:2,	//已付款
 	delivered:3,	//已发货
-	checked:4,	//已收货
+	received:4,	//已收货
 	closed:5,	//订单已关闭
 	deleted:6,	//订单已删除
 	refund:7,	//退款中 必须在已付款的状态下才能申请退款
@@ -47,7 +48,7 @@ var order = {
 	expressNumber:'',	//快递单号
 	customExpressInfo:[],	//自定义快递信息,[{context:'',time:''}]
 	freight:0,	// 快递费用
-	paymentplatform:'',	//支付平台 "1" 微信;"2" 支付宝
+	paymentPlatform:'2',	//支付平台 "1" 微信;"2" 支付宝
 	paymentNotice:'',	//支付消息记录
 	operation:[],	//[{desc:'',timestamp:''}]
 	status:orderStatus.unpaid,	//初始状态为等待付款
@@ -91,6 +92,11 @@ module.exports = {
 						callback('该商品不存在')
 					}else{
 						var product = JSON.parse(replies);
+						// 商品是否正在销售
+						if(product.status!=productStatus.onSale||product.saleStartTime>now||product.saleOffTime<now){
+							res.send('商品未开发购买');
+							return;
+						}					
 						if(product.count<count){	//商品数量不够
 							callback('商品数量不够')
 						}else{	// 创建订单
@@ -171,7 +177,6 @@ module.exports = {
 				}else{
 					var order = JSON.parse(replies);
 					if(order.userID==uid){
-
 						redisCli.hget(productKey,order.productID,function(err,replies){
 							if(replies){
 								order.product = JSON.parse(replies);
@@ -234,7 +239,8 @@ module.exports = {
 			callback('用户ID不能为空')
 		}
 	},
-	// 获取待支付订单
+	// 获取用户待支付订单
+	// @params uid
 	getUnpaidOrder: function(uid,callback){
 		if(uid){
 			redisCli.lrange(redisKey.getUserOrderKey(uid),0,-1,function(err,replies){
@@ -249,32 +255,39 @@ module.exports = {
 								unpaid.unshift(order.id);
 							}
 						});
-
-						// 获取订单详细信息
-						redisCli.hmget(orderKey,unpaid,function(err,replies){
-							if(err){
-								callback(err)
-							}else{
-								var productIDArr = [];
-								var result = [];
-								replies.forEach(function(val){
-									var order = JSON.parse(val);
-									result.push(order);
-									productIDArr.push(order.productID)
-								});
-								//获取商品信息
-								redisCli.hmget(productKey,productIDArr,function(err,replies){
-									if(err){
-										callback(err)
-									}else{
-										result.forEach(function(order,i){
-											order.product = JSON.parse(replies[i]);
-										});
-										callback(null,result)
-									}
-								})								
-							}
-						});
+						if(unpaid.length){
+							// 获取订单详细信息
+							redisCli.hmget(orderKey,unpaid,function(err,replies){
+								if(err){
+									callback(err)
+								}else{
+									var productIDArr = [];
+									var result = [];
+									replies.forEach(function(val){
+										var order = JSON.parse(val);
+										result.push(order);
+										productIDArr.push(order.productID)
+									});
+									//获取商品信息
+									redisCli.hmget(productKey,productIDArr,function(err,replies){
+										if(err){
+											callback(err)
+										}else{
+											result.forEach(function(order,i){
+												order.product = JSON.parse(replies[i]);
+											});
+											// 对数组重排，按时间降序排列
+											result = result.sort(function(a,b){
+												return a.timestamp<b.timestamp
+											})
+											callback(null,result)
+										}
+									})								
+								}
+							});
+						}else{
+							callback(null,unpaid)
+						}
 					}else{
 						callback(null,[]);		
 					}
@@ -284,7 +297,8 @@ module.exports = {
 			callback('用户ID不能为空')
 		}
 	},
-	// 获取已经付款的订单
+	// 获取用户已经付款的订单
+	// @params uid
 	getPaidOrder: function(uid,callback){
 		if(uid){
 			redisCli.lrange(redisKey.getUserOrderKey(uid),0,-1,function(err,replies){
@@ -299,31 +313,39 @@ module.exports = {
 								paid.unshift(order.id);
 							}
 						});
-						// 获取订单详细信息
-						redisCli.hmget(orderKey,paid,function(err,replies){
-							if(err){
-								callback(err)
-							}else{
-								var productIDArr = [];
-								var result = [];
-								replies.forEach(function(val){
-									var order = JSON.parse(val);
-									result.push(order);
-									productIDArr.push(order.productID)
-								});
-								//获取商品信息
-								redisCli.hmget(productKey,productIDArr,function(err,replies){
-									if(err){
-										callback(err)
-									}else{
-										result.forEach(function(order,i){
-											order.product = JSON.parse(replies[i]);
-										});
-										callback(null,result)
-									}
-								})									
-							}
-						});
+						if(paid.length){
+							// 获取订单详细信息
+							redisCli.hmget(orderKey,paid,function(err,replies){
+								if(err){
+									callback(err)
+								}else{
+									var productIDArr = [];
+									var result = [];
+									replies.forEach(function(val){
+										var order = JSON.parse(val);
+										result.push(order);
+										productIDArr.push(order.productID)
+									});
+									//获取商品信息
+									redisCli.hmget(productKey,productIDArr,function(err,replies){
+										if(err){
+											callback(err)
+										}else{										
+											result.forEach(function(order,i){
+												order.product = JSON.parse(replies[i]);
+											});
+											// 对数组重排，按时间降序排列
+											result = result.sort(function(a,b){
+												return a.timestamp<b.timestamp
+											})
+											callback(null,result)
+										}
+									})									
+								}
+							});
+						}else{
+							callback(null,paid);
+						}
 					}else{
 						callback(null,[]);		
 					}
@@ -333,7 +355,8 @@ module.exports = {
 			callback('用户ID不能为空')
 		}
 	},
-	// 获取已经完成的订单,包括已收货订单已经已关闭订单
+	// 获取已经完成的订单,包括已收货订单以及已关闭订单
+	// @params uid:用户ID start:开始位置 count:订单数量
 	getCompleteOrder: function(uid,start,count,callback){
 		if(uid){
 			var end = parseInt(start)+parseInt(count);
@@ -345,40 +368,49 @@ module.exports = {
 					if(replies.length==0){
 						callback(null,null)
 					}else{						
-						var complete = [];	//未完成订单数组
+						var complete = [];	//已经完成订单数组
+						var uncomplete = [orderStatus.unpaid,orderStatus.paid,orderStatus.delivered];
 						_.each(replies,function(val){
 							var small_order = JSON.parse(val);							
-							if(small_order.status != orderStatus.paid&&small_order.status != orderStatus.unpaid){
+							if(!_.contains(uncomplete,small_order.status)){
 								complete.push(small_order.id);
 							}
 						});
 						// 获取数组片段
-						chunk = complete.slice(start,end);
-						// 获取订单详细信息
-						redisCli.hmget(orderKey,chunk,function(err,replies){
-							if(err){
-								callback(err)
-							}else{
-								var productIDArr = [];
-								var result = [];
-								replies.forEach(function(val){
-									var order = JSON.parse(val);
-									result.push(order);
-									productIDArr.push(order.productID)
-								});
-								//获取商品信息
-								redisCli.hmget(productKey,productIDArr,function(err,replies){
-									if(err){
-										callback(err)
-									}else{
-										result.forEach(function(order,i){
-											order.product = JSON.parse(replies[i]);
-										});
-										callback(null,result)
-									}
-								})
-							}
-						});
+						var chunk = complete.slice(start,end);
+						if(chunk.length){
+							// 获取订单详细信息
+							redisCli.hmget(orderKey,chunk,function(err,replies){
+								if(err){
+									callback(err)
+								}else{
+									var productIDArr = [];
+									var result = [];
+									replies.forEach(function(val){
+										var order = JSON.parse(val);
+										result.push(order);
+										productIDArr.push(order.productID)
+									});
+									//获取商品信息
+									redisCli.hmget(productKey,productIDArr,function(err,replies){
+										if(err){
+											callback(err)
+										}else{
+											result.forEach(function(order,i){
+												order.product = JSON.parse(replies[i]);
+											});
+											// 对数组重排，按时间降序排列
+											result = result.sort(function(a,b){
+												return a.timestamp<b.timestamp
+											})
+											callback(null,result)
+										}
+									})
+								}
+							});
+						}else{
+							callback(null,chunk)
+						}
 					}
 				}
 			})
@@ -597,7 +629,7 @@ module.exports = {
 			callback('订单收货失败')
 		}
 		function check(callback){
-			changeOrder(id,{status:orderStatus.checked},function(err,replies){
+			changeOrder(id,{status:orderStatus.received},function(err,replies){
 				if(err){
 					callback(err)
 				}else{
@@ -771,7 +803,7 @@ var changeOrder = function(id,changedVal,callback){
 							}else if((order.status!=orderStatus.paid&&order.status!=orderStatus.returnGoodsSuccess)&&val==orderStatus.refund){
 								callback('订单无法更改为退款状态')
 								return;
-							}else if(order.status!=orderStatus.delivered&&val==orderStatus.checked){
+							}else if(order.status!=orderStatus.delivered&&val==orderStatus.received){
 								callback('订单无法更改为已收货状态')
 								return;
 							}

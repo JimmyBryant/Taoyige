@@ -1,13 +1,14 @@
 module.exports = {
-	"host":"http://192.168.1.106:3001",
-	"shost":"http://192.168.1.106:3001",
-	"mhost":"http://192.168.1.106:3001/welcome",	//触屏版域名
-	"admin_host":"http://192.168.1.106:3001",
+	"host":"http://192.168.1.105:3001",
+	"shost":"http://192.168.1.105:3001",
+	"mhost":"http://192.168.1.105:3001/welcome",	//触屏版域名
+	"admin_host":"http://192.168.1.105:3001",
 	"port":"3001",
 	"env":"development",
+	"title":"淘一个-美国特价正品直发闪购!",
 	"redis":{
 		"host":"192.168.1.200",
-		"port":"6380"
+		"port":"6381"
 	},
 	"session":{
 		"secret":"sdfl哪里",
@@ -21,6 +22,10 @@ module.exports = {
 	"administrators":[{
 		"name":"admin",
 		"password":"123"
-	}]
+	}],
+	"tokens":{
+		"android":"AMC4FRJZVG1T3S5NUHIWX9QKL07BOPY286ED",
+		"ios":"123"
+	}
 
 }

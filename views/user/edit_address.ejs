@@ -51,7 +51,13 @@
 					<label class="field-title">区县：</label>
 					<span class="field-content">
 						<select name="county" id="county" data-validate="addr-county">
-							<option value="<%=address.county%>"><%=addressMap[address.county][0]%></option>
+							<option value="<%=address.county%>">
+								<%if(address.county!=-1){%>
+									<%=addressMap[address.county]&&addressMap[address.county][0]%>
+								<%}else{%>
+									无
+								<%}%>
+							</option>
 						</select>
 						<b class="arrow-down"></b>
 					</span>

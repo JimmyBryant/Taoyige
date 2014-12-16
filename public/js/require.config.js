@@ -15,7 +15,9 @@ require.config({
 		'M_validate':'mobile.validate',
 		'M_alert':'mobile.alert',
 		'jform':'jquery.form.min',
-		'lazy':'jquery.lazyload.min'
+		'lazy':'jquery.lazyload.min',
+		'jdatepick':'jquery.datepick.min',
+		'jdatepick_zh':'jquery.datepick-zh-CN'		
 	},
 	shim:{
 		'swiper':{
@@ -32,6 +34,12 @@ require.config({
 		},
 		'jform':{
 			deps: ['jquery']
+		},
+		'jdatepick':{
+			deps:['jquery','jquery.plugin.min']
+		},
+		'jdatepick_zh':{
+			deps:['jdatepick']
 		}
 	}
 })

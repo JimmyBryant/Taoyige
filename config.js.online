@@ -5,6 +5,7 @@ module.exports = {
 	"admin_host":"https://www.taoyige.com",
 	"port":"3001",
 	"env":"product",
+	"title":"淘一个-美国特价正品直发闪购!",
 	"redis":{
 		"host":"127.0.0.1",
 		"port":"6381"
@@ -21,5 +22,9 @@ module.exports = {
 	"administrators":[{
 		"name":"instreet",
 		"password":"instreet123"
-	}]
+	}],
+	"tokens":{
+		"android":"AMC4FRJZVG1T3S5NUHIWX9QKL07BOPY286ED",
+		"ios":"Y6HQDOE208NRU54SVZKBWAC3T7I9MJ1GFXLP"
+	}
 }

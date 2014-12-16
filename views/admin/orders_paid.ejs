@@ -57,7 +57,7 @@
                   <span class="text-primary"><%=order.id%></span>
                   <span class="dealtime"><%=getLocalFormat(D)%></span>
                   <label class="fr">
-                    用户：<a href="#"><%=order.user.userName%></a>
+                    用户：<a href="#"><%=order.user&&order.user.userName%></a>
                   </label>                   
                 </td>
               </tr>

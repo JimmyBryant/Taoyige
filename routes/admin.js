@@ -2,6 +2,7 @@
 var orderManager = require('../base/orderManager')
 	,orderStatus = orderManager.orderStatus
 	,productManager = require('../base/productManager')
+	,appInfoManager = require('../base/appInfoManager')
 	,productStatus = productManager.productStatus
 	,mapper = require('xto').mapper
 	,gm = require('gm')
@@ -115,6 +116,12 @@ var order = {
 	refundSuccess: function(req,res){
 		if(method=='get'){
 			getOrderlist('refundSuccess',req,res);
+		}
+	},
+	// 交易完成的订单 用户已经收货
+	received: function(req,res){
+		if(method=='get'){
+			getOrderlist('received',req,res);
 		}
 	},
 	// 查询订单
@@ -270,6 +277,21 @@ var order = {
 					res.send('订单成功设置为办理退款中')
 				}
 			})
+		}
+	},
+	// 设置订单状态为已收货
+	setReceived: function(req,res,next){
+		if(method=='get'){
+			var id = req.query.id;
+			orderManager.checkOrder(id,function(err,replies){
+				if(err){
+					res.send('操作失败')
+				}else{
+					res.send('交易完成，订单状态设置为已收货，订单编号：'+id)
+				}
+			})
+		}else{
+			next()
 		}
 	},
 	// 设置订单状态为退款成功
@@ -523,6 +545,56 @@ var product = {
 	}
 }
 
+//应用版本信息管理
+var apps = {
+	android:function (req,res,next) {
+		if(method=='get'){
+			var app = null;
+			appInfoManager.getAndroidAppInfo(function(err,replies){
+				if(require){
+					app = replies;
+				}
+				res.render('admin/apps_android',{app:app});
+			});			
+		}else if(method=='post'){
+			var params = req.body
+				,dateRange = params.dateRange
+				;
+			// 如果没有设置时间，提交失败
+			var rangeArr = dateRange.split(' - ');
+			if(!dateRange||rangeArr.length!=2){
+				res.redirect('/admin/apps/android');
+				return;
+			}
+			var startDate = rangeArr[0]
+				,endDate = rangeArr[1]
+				,appInfo = {
+					versionName: params.versionName||'',
+					versionCode: params.versionCode||'',
+					downloadUrl: params.downloadUrl||'',
+					updateLog: params.updateLog||'',
+					imglist: params.imglist||'',
+					startDate:startDate,
+					endDate:endDate,
+					update:params.updateActive==1?true:false
+				};
+			appInfoManager.updateAndroidAppInfo(appInfo,function(err,replies){
+				res.redirect('/admin/apps/android');
+			})				
+
+		}		
+	},
+	android_pad:function (req,res,next){
+		next();
+	},
+	iphone:function (req,res,next){
+		next();
+	},
+	ipad:function (req,res,next){
+		next();
+	}
+}
+
 function resize(image,callback){
 	var date = new Date()
 		,folder = date.getFullYear()+parseTime((date.getMonth()+1))+parseTime(date.getDate())
@@ -725,13 +797,17 @@ function HTML_productDetails(product){
 function HTML_index(product,readylist){
 	var path = node_path.join(__dirname,'../views/index.ejs')		
 		,htmlStr = ejs.render(fs.readFileSync(path,'utf-8'),{product:product,readylist:readylist,user:null,filename:path})	// 注意ejs.render方法需要传入filename属性，即ejs文件路径
-		,name = new Date(new Date().toDateString()).valueOf()+'.html'
-		,html_path = node_path.join(__dirname,'../public/html/',name)
+		,date = new Date()
+		,Y = date.getFullYear().toString()
+		,M = date.getMonth()+1
+		,D = date.getDate()
+		,file_name = Y+(M<10?'0'+M:M)+(D<10?'0'+D:D)+'.html'
+		,html_path = node_path.join(__dirname,'../public/html/',file_name)
 		;
 	fs.writeFileSync(html_path,htmlStr);	
 }
 
-function control (obj,req,res,next){
+function controller (obj,req,res,next){
 	var action = req.params.action		
 		;
 	method = req.method.toLowerCase();
@@ -745,12 +821,15 @@ function control (obj,req,res,next){
 }
 
 module.exports.index = function(req,res,next){
-	control(admin,req,res,next)
+	controller(admin,req,res,next)
 }
 module.exports.order = function(req,res,next){
-	control(order,req,res,next)
+	controller(order,req,res,next)
 }
 module.exports.product = function(req,res,next){
-	control(product,req,res,next)
+	controller(product,req,res,next)
+}
+module.exports.apps = function(req,res,next){
+	controller(apps,req,res,next)
 }
 module.exports.HTML_index = HTML_index;

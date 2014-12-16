@@ -17,8 +17,9 @@ var user = {
 
 var loginPlatform = {
 	'alipay':1,
-	'weibo':'2',
-	'qq':'3'
+	'weibo':2,
+	'qq':3,
+	'weixin':4
 }
 
 var userKey = redisKey.user	

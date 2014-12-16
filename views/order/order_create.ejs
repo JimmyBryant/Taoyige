@@ -27,7 +27,8 @@
 							<label><%=addr.name%></label><span class="addr-mobile"><%=addr.mobilephone%></span>
 						</p>
 						<p>
-							<%=addressMap[addr.province]&&addressMap[addr.province][0]%><%=addressMap[addr.city]&&addressMap[addr.city][0]%><%=addressMap[addr.county]&&addressMap[addr.city][0]%><%=addr.details%>
+							<%=addressMap[addr.province]&&addressMap[addr.province][0]%><%=addressMap[addr.city]&&addressMap[addr.city][0]%><%if(addr.county!=-1){%><%=addressMap[addr.county]&&addressMap[addr.county][0]%><%}%>
+							<%=addr.details%>
 						</p>
 					</a>
 				</dd>

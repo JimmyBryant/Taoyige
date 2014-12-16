@@ -2,11 +2,22 @@
 <html>
   <head>  
     <% include template/meta %>
-    <title>淘一个</title>
+    <title><%=global.appConfig.title%></title>
   </head>
 
   <body>    
   	<div class="main">
+      <div id="client-app-banner">
+        <div class="app-wrapper">   
+          <a href="javascript:;" class="app-close-btn">×</a>     
+          <img class="app-icon" src="<%=global.appConfig.shost%>/images/logo/app_icon.png">
+          <span class="app-text">
+            <strong>淘一个</strong>
+            <em>下载手机APP,闪购随时随地</em>
+          </span>
+          <span class="app-go"></span>
+        </div>
+      </div> 
   		<header class="index-header">
   			<div class="h-left">
   				<a href="/user/home" class="user-home">
@@ -31,7 +42,7 @@
         	<img alt="<%=product.title%>" src="<%=product.largeImageUrl[0]%>"/>
         </a>
         <p class="p-title">
-          <%-product.title%>
+          <%=product.title%>      
         </p>
   			<ul class="sale-desc clearfix">
   				<li class="p-salevolume"><span class="p-icon"></span><label>已售：<span></span>件</label></li>
@@ -39,15 +50,25 @@
   			</ul>
   			<div class="p-action clearfix">
   				<div class="left">
-  					<label class="p-nowprice"><strong>￥<%=product.price%></strong></label>
-  				</div>
-  				<div class="right">
-  					<label >
-  						<span class="p-price">
-                市场价：<del><%=product.oriPrice%></del>
+  					<label class="p-nowprice">
+              <strong>
+              ￥<%=product.price%>
+              </strong>  
+              <span class="p-tags">
+                <span class="p-nochange">一口价</span>
+                <span class="p-discount">
+                <%=(Math.round(product.price/product.oriPrice*100)/10)%>折
+                </span>                
+              </span>            
+            </label>
+            <label class="p-additional">
+              <span class="p-price">
+                市场价:
+                <span>￥</span><del><%=product.oriPrice%></del>
               </span>
-  						<span class="p-discount"><em><%=(Math.round(product.price/product.oriPrice*100)/10)%>折</em></span>
-  					</label>
+            </label>
+  				</div>
+  				<div class="right">  					
   					<a href="javascript:;" class="btn-shopping-now <%if(product.count<1||product.saleStartTime>Date.now()){%>disable<%}%>">立即闪购</a>
   				</div>
   			</div>

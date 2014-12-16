@@ -4,6 +4,23 @@
 
 define(['jquery','M_alert'],function($,M_alert){
 
+	var app_cookie_name = "taoyige_app_recommand";
+	var $app_banner = $('#client-app-banner');
+	// 默认显示APP推广
+	if(!getCookie(app_cookie_name)){
+		$app_banner.show();
+	}
+	//点击下载手机app
+	$app_banner.on('click',function(){
+		var download_url = "http://android.myapp.com/myapp/detail.htm?apkName=com.taoyige";
+		location.href = download_url;
+	})
+	$('.app-close-btn',$app_banner).on('click',function(e){
+		$app_banner.fadeOut();
+		e.stopPropagation();
+		setCookie(app_cookie_name,1);
+	})
+
 	// 返回上一页
 	$('.user-header .h-back').on('click',function(){
 		history.go(-1);
@@ -37,7 +54,7 @@ define(['jquery','M_alert'],function($,M_alert){
 						}else if(data.err==5){
 							malert.show('danger','该商品还未开放购买');
 						}else if(data.err==6){
-							malert.show('danger','抱歉,该商品已经售罄');							
+							malert.show('danger','抱歉,该商品已售罄');							
 						}						
 					}else{
 						if (typeof data=='object'){
@@ -103,5 +120,34 @@ define(['jquery','M_alert'],function($,M_alert){
 		}
 	}
 
+	// 设置Cookie
+	function setCookie(name, value, expires){ 
+	    var argv = setCookie.arguments; 
+	    var argc = setCookie.arguments.length; 
+	    var expires = (argc > 2) ? argv[2] : null; 
+	    if(expires!=null) 
+	    { 
+	        var LargeExpDate = new Date (); 
+	        LargeExpDate.setTime(LargeExpDate.getTime() + (expires*1000*3600*24));         
+	    } 
+	    document.cookie = name + "=" + escape (value)+((expires == null) ? "" : ("; expires=" +LargeExpDate.toGMTString())); 
+	}
+
+	// 获取Cookie
+	function getCookie(Name) { 
+	    var search = Name + "=" 
+	    if(document.cookie.length > 0) 
+	    { 
+	        offset = document.cookie.indexOf(search) 
+	        if(offset != -1) 
+	        { 
+	            offset += search.length 
+	            end = document.cookie.indexOf(";", offset) 
+	            if(end == -1) end = document.cookie.length 
+	            return unescape(document.cookie.substring(offset, end)) 
+	        } 
+	        else return "" 
+	    } 
+	} 
 	return TYG_utils;
 });

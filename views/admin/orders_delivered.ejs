@@ -86,7 +86,10 @@
                 <td class="operate">
                   <a class="btn btn-primary" target="_blank" href="/admin/orders/edit_express?id=<%=order.id%>">
                     修改快递信息
-                  </a> 
+                  </a>
+                  <a class="btn btn-danger" target="_blank" href="/admin/orders/setReceived?id=<%=order.id%>" onclick="if(confirm('确定用户已经收到货物？')==false)return false;">
+                  交易完成
+                  </a>  
                 </td>
               </tr>
             </tbody>

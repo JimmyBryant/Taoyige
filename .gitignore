@@ -8,14 +8,14 @@ lib-cov
 *.gz
 *.rdb
 *.log
+*.html
 
 pids
 logs
 results
 uploads
+
 /public/products
-**/html/*.html
-**/html/products/*.html
 **/views/*.html
 npm-debug.log
 **/log/**

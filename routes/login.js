@@ -112,7 +112,7 @@ module.exports.loginReturn = function(req,res){
 											pUserID:openid,
 											pUserName:data.nickname,
 											userName:data.nickname,
-											profile_image_url:data.figureurl_2						
+											thumbUrl:data.figureurl_2						
 										}
 										userLogin(user);
 									}else{
@@ -155,7 +155,7 @@ module.exports.loginReturn = function(req,res){
 									pUserID:data.id,
 									pUserName:data.name,
 									userName:data.name,
-									profile_image_url:data.profile_image_url						
+									thumbUrl:data.profile_image_url						
 								}
 								userLogin(user);
 							}else{
@@ -226,10 +226,10 @@ module.exports.autoLogin = function(req,res,next){
 	var config = global.appConfig
 		,authCookie = config.cookie.authCookie
 		,path = req.path.length>1&&req.path.lastIndexOf('/')==req.path.length-1?req.path.substr(0,req.path.length-1):req.path
-		,noLoginUrl = ['/','/about','/welcome','/login','/logout','/loginRedirect','/loginReferer','/loginReturn','/purchase/pay_notify',
-				'/product/details','/product/getUserInfo']
+		,noLoginUrl = []
 		,isAdminPath = path.indexOf('/admin')!=-1
 		;
+
 	if(isAdminPath){
 		if(path=='/admin/login'){
 			next();
@@ -260,7 +260,6 @@ module.exports.autoLogin = function(req,res,next){
 					}				
 				})
 			}else{	//不存在cookie
-					
 				if(path.indexOf('/purchase/addto_cart')!=-1){
 					req.session.loginReferer = '/'
 				}

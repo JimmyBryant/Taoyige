@@ -6,6 +6,7 @@ module.exports = {
 	"productSale" : "productSale",	//正在销售的商品
 	"productReady":"H:product:ready", //准备销售的商品
 	"productStore":"L:product:store",	//仓库中的商品
+	"apps":"H:apps",	//移动端app信息
 	"user" : "H:user",
 	"order" : "H:order",
 	"address" : "H:address",

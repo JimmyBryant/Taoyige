@@ -16,7 +16,7 @@ var error = {
 	"hasOne":3,	// 已经购买过该商品
 	"isAdmin":4,
 	"notSale":5,
-	"soldOut":6	//商品已经售罄
+	"soldOut":6	//商品已售罄
 }
 
 var method = ''
@@ -48,11 +48,11 @@ var actions = {
 						})
 					}else{
 						var product = JSON.parse(replies)
-							now = Date.now()
+							,now = Date.now()
 							;
 						// 先判断该商品是否正在销售
 						if(product.status==productStatus.onSale&&product.saleStartTime<now&&product.saleOffTime>now){
-							if(product.count<count){	//商品数量不够
+							if(product.count<count){	//商品库存不够
 								res.send({
 									err:error.soldOut
 								})
@@ -61,24 +61,28 @@ var actions = {
 									if(err){
 										res.send(false)
 									}else{
-										// 暂时不限制购买
-		/*								for(var i=0,len=replies.length;i<len;i++){
+										// 每人每天限买一件
+										for(var i=0,len=replies.length;i<len;i++){
 											var small_order = replies[i];
-											if(small_order.status==orderStatus.unpaid||small_order.status==orderStatus.hasPaid){
+											if(small_order.status==orderStatus.unpaid||small_order.status==orderStatus.paid){
 												if(small_order.status == orderStatus.unpaid){
-													// 购买该商品还未付款
+													// 存在未付款订单
 													res.send({
 														err:error.unpaid
-													})
+													});
+													return false;
 												}else{
-													// 已经购买过该商品
-													res.send({
-														err:error.hasOne
-													})
+													if(new Date().toDateString()==new Date(small_order.timestamp).toDateString()){
+														// 今天已经购买过该商品
+														res.send({
+															err:error.hasOne
+														})
+														return false;
+													}
 												}
-												return;
+												
 											}
-										}*/
+										}
 
 										// 可以添加商品到购物车
 										var cart = {

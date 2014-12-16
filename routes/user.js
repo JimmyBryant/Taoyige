@@ -17,6 +17,7 @@ var controller = {
 		var m = req.method
 			,user = req.session.userInfo
 			;
+
 		if(m=='GET'){
 			res.render('user/home',{user:user,loginPlatform:userManager.loginPlatform});
 		}
@@ -26,7 +27,8 @@ var controller = {
 		var user = req.session.userInfo
 			;
 		addressManager.getAddressList(user.id,function(err,replies){
-			res.render('user/my_address',{user:user,err:err,addressList:replies,addressMap:addressMap});
+			var list = replies||[];
+			res.render('user/my_address',{user:user,err:err,addressList:list,addressMap:addressMap});
 		})
 	},
 	//  增加收货地址
